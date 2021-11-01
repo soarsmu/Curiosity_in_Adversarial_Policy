@@ -945,6 +945,7 @@ class MyPPO_RND(ActorCriticRLModel):
         self.entropy = None
         self.vf_loss = None
         self.pg_loss = None
+        self.rnd_loss = None
         self.approxkl = None
         self.clipfrac = None
         self.params = None
@@ -1110,6 +1111,9 @@ class MyPPO_RND(ActorCriticRLModel):
 
 
                 # Define RND base network and RND network
+                rnd_base_network = RndValue(self.sess, self.observation_space, self.action_space,
+                                                   self.n_envs // self.nminibatches, self.n_steps,
+                                                   n_batch_train)
                 with tf.variable_scope("rnd_model", reuse=tf.AUTO_REUSE):
                     rnd_network = RndValue(self.sess, self.observation_space, self.action_space,
                                                    self.n_envs // self.nminibatches, self.n_steps,
@@ -1178,9 +1182,9 @@ class MyPPO_RND(ActorCriticRLModel):
                     vf_losses1 = tf.square(vpred - self.rewards_ph)
                     vf_losses2 = tf.square(vpredclipped - self.rewards_ph)
 
-                    predict_features = 0
-                    target_features = 0
-                    rnd_loss = .5 * (predict_features - target_features) ** 2
+                    predict_features = rnd_base_network.value_flat
+                    target_features = rnd_network.value_flat
+                    self.rnd_loss = .5 * tf.reduce_sum(predict_features - target_features) ** 2
 
                     self.vf_loss = .5 * tf.reduce_mean(tf.maximum(vf_losses1, vf_losses2))
 
@@ -1239,7 +1243,7 @@ class MyPPO_RND(ActorCriticRLModel):
                     tf.summary.scalar('approximate_kullback-leibler', self.approxkl)
                     tf.summary.scalar('clip_factor', self.clipfrac)
                     tf.summary.scalar('loss', loss)
-                    tf.summary.scalar('rnd_loss', rnd_loss)
+                    tf.summary.scalar('rnd_loss', self.rnd_loss)
                     if self.retrain_vicitim and not self.use_baseline_policy:
                         if self.env_name == 'multicomp/YouShallNotPassHumans-v0':
                             params = tf_util.get_trainable_vars("victim_policy")
@@ -1255,7 +1259,7 @@ class MyPPO_RND(ActorCriticRLModel):
                             tf.summary.histogram(var.name, var)
 
                     self.params = [params, tf_util.get_trainable_vars("value_model"),
-                                   tf_util.get_trainable_vars("value1_model")]
+                                   tf_util.get_trainable_vars("value1_model"), tf_util.get_trainable_vars("rnd_model")]
 
                     grads = tf.gradients(loss, self.params[0])
                     if self.max_grad_norm is not None:
@@ -1272,6 +1276,12 @@ class MyPPO_RND(ActorCriticRLModel):
                         grads_value1, _grad_norm_value = tf.clip_by_global_norm(grads_value1, self.max_grad_norm)
                     grads_value1 = list(zip(grads_value1, self.params[2]))
 
+                    grads_rnd = tf.gradients(self.rnd_loss, self.params[3])
+                    if self.max_grad_norm is not None:
+                        grads_rnd, _grad_norm_rnd = tf.clip_by_global_norm(grads_rnd, self.max_grad_norm)
+                    grads_rnd = list(zip(grads_rnd, self.params[3]))
+
+
                 trainer = tf.train.AdamOptimizer(learning_rate=self.learning_rate_ph, epsilon=1e-5)
                 self._train = trainer.apply_gradients(grads)
 
@@ -1281,8 +1291,11 @@ class MyPPO_RND(ActorCriticRLModel):
                 trainer_value1 = tf.train.AdamOptimizer(learning_rate=self.learning_rate_ph, epsilon=1e-5)
                 self._train_value1 = trainer_value1.apply_gradients(grads_value1)
 
+                trainer_rnd = tf.train.AdamOptimizer(learning_rate=self.learning_rate_ph, epsilon=1e-5)
+                self._train_rnd = trainer_rnd.apply_gradients(grads_rnd)
+
                 self.loss_names = ['policy_loss', 'value_loss', 'policy_entropy', 'approxkl', 'clipfrac',
-                                   '_opp_value_loss', 'opp_policy_loss', 'adv_policy_loss', 'abs_policy_loss']
+                                   '_opp_value_loss', 'opp_policy_loss', 'adv_policy_loss', 'abs_policy_loss', 'rnd_loss']
 
                 with tf.variable_scope("input_info", reuse=False):
                     tf.summary.scalar('discounted_rewards', tf.reduce_mean(self.rewards_ph))
@@ -1313,6 +1326,9 @@ class MyPPO_RND(ActorCriticRLModel):
 
                 self.vtrain1_model = vtrain1_model
                 self.vact1_model = vact1_model
+
+                self.rnd_base_network = rnd_base_network
+                self.rnd_network = rnd_network
 
                 self.step = act_model.step
                 self.proba_step = act_model.proba_step
@@ -1437,28 +1453,6 @@ class MyPPO_RND(ActorCriticRLModel):
             update_fac = self.n_batch // self.nminibatches // self.noptepochs // self.n_steps + 1
 
         assert (writer == None, print('only support none writer'))
-        # if writer is not None:
-        #     # run loss backprop with summary, but once every 10 runs save the metadata (memory, compute time, ...)
-        #     if self.full_tensorboard_log and (1 + update) % 10 == 0:
-        #         run_options = tf.RunOptions(trace_level=tf.RunOptions.FULL_TRACE)
-        #         run_metadata = tf.RunMetadata()
-        #         summary, policy_loss, value_loss, policy_entropy, approxkl, clipfrac, _, \
-        #         _, opp_vf_loss = self.sess.run(
-        #             [self.summary, self.pg_loss, self.vf_loss, self.entropy, self.approxkl, self.clipfrac, self._train,
-        #              self._train_value,
-        #              self.opp_vf_loss],
-        #             td_map, options=run_options, run_metadata=run_metadata)
-        #         writer.add_run_metadata(run_metadata, 'step%d' % (update * update_fac))
-        #     else:
-        #         summary, policy_loss, value_loss, policy_entropy, approxkl, clipfrac, _, \
-        #         _, opp_vf_loss = self.sess.run(
-        #             [self.summary, self.pg_loss, self.vf_loss, self.entropy, self.approxkl, self.clipfrac, self._train,
-        #              self._train_value,
-        #              self.opp_vf_loss],
-        #             td_map)
-        #
-        #     writer.add_summary(summary, (update * update_fac))
-        # else:
         policy_loss, value_loss, policy_entropy, approxkl, clipfrac, _, \
         _, opp_vf_loss, opp_pg_loss, adv_pg_loss, abs_pg_loss = self.sess.run(
             [self.pg_loss, self.vf_loss, self.entropy, self.approxkl, self.clipfrac, self._train,
