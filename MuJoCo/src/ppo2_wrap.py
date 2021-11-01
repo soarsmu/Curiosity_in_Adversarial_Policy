@@ -1110,7 +1110,7 @@ class MyPPO_RND(ActorCriticRLModel):
 
 
                 # Define RND base network and RND network
-                with tf.variable_scope("rnd", reuse=tf.AUTO_REUSE):
+                with tf.variable_scope("rnd_model", reuse=tf.AUTO_REUSE):
                     rnd_network = RndValue(self.sess, self.observation_space, self.action_space,
                                                    self.n_envs // self.nminibatches, self.n_steps,
                                                    n_batch_train)

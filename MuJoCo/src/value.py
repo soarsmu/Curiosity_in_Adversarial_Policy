@@ -374,9 +374,9 @@ class RNDFeedForward(ActorCriticPolicy):
             else:
                 rnd_latent = tf.layers.flatten(self.processed_obs)
                 for i, layer_size in enumerate(layers):
-                    rnd_latent = act_fun(linear(rnd_latent, 'pi_fc' + str(i), n_hidden=layer_size,
+                    rnd_latent = act_fun(linear(rnd_latent, 'rnd_fc' + str(i), n_hidden=layer_size,
                                                         init_scale=np.sqrt(2)))
-            self._value_fn = linear(rnd_latent, 'vf', 1)
+            self._value_fn = linear(rnd_latent, 'rnd', 1)
 
         self._setup_init()
 
