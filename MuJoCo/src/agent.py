@@ -10,7 +10,7 @@ from common import trigger_map, action_map, get_zoo_path
 import tensorflow as tf
 from zoo_utils import MlpPolicyValue, LSTMPolicy, load_from_file, load_from_model, setFromFlat
 from stable_baselines.common.policies import MlpPolicy, MlpLstmPolicy
-from ppo2_wrap import MyPPO2
+from ppo2_wrap import MyPPO2, MyPPO_RND
 
 
 # Random agent
