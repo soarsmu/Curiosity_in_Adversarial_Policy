@@ -300,8 +300,6 @@ class FeedForwardPolicy(ActorCriticPolicy):
                     vf_latent = act_fun(linear(vf_latent, 'pi_fc' + str(i), n_hidden=layer_size,
                                                         init_scale=np.sqrt(2)))
             self._value_fn = linear(vf_latent, 'vf', 1)
-            self._rnd_fn = linear(vf_latent, 'rnd', 1)
-
 
         self._setup_init()
 
@@ -394,8 +392,6 @@ class RNDFeedForward(ActorCriticPolicy):
 
     def step(self, obs, state=None, mask=None, deterministic=False):
         pass
-
-
 
 
 class RndValue(RNDFeedForward):
