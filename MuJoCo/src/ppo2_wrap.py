@@ -1111,13 +1111,9 @@ class MyPPO_RND(ActorCriticRLModel):
 
 
                 # Define RND base network and RND network
-                rnd_base_network = RndValue(self.sess, self.observation_space, self.action_space,
-                                                   self.n_envs // self.nminibatches, self.n_steps,
-                                                   n_batch_train)
+                rnd_base_network = RndValue(self.sess, self.observation_space, self.action_space, self.n_envs, 1, n_batch_step)
                 with tf.variable_scope("rnd_model", reuse=tf.AUTO_REUSE):
-                    rnd_network = RndValue(self.sess, self.observation_space, self.action_space,
-                                                   self.n_envs // self.nminibatches, self.n_steps,
-                                                   n_batch_train)
+                    rnd_network = RndValue(self.sess, self.observation_space, self.action_space, self.n_envs, 1, n_batch_step)
 
 
 
@@ -1184,7 +1180,7 @@ class MyPPO_RND(ActorCriticRLModel):
 
                     predict_features = rnd_base_network.value_flat
                     target_features = rnd_network.value_flat
-                    self.rnd_loss = .5 * tf.reduce_sum(predict_features - target_features) ** 2
+                    self.rnd_loss = .5 * tf.reduce_sum((predict_features - target_features) ** 2)
 
                     self.vf_loss = .5 * tf.reduce_mean(tf.maximum(vf_losses1, vf_losses2))
 
@@ -1493,7 +1489,8 @@ class MyPPO_RND(ActorCriticRLModel):
             self._setup_learn(seed)
             runner = Runner(env=self.env, model=self, n_steps=self.n_steps, gamma=self.gamma,
                             lam=self.lam, v_model=self.vact_model, v1_model=self.vact1_model,
-                            is_mlp=self.is_mlp, use_victim_ob=use_victim_ob)
+                            is_mlp=self.is_mlp, use_victim_ob=use_victim_ob, rnd_network=self.rnd_network,
+                            rnd_base_network=self.rnd_base_network)
 
             self.episode_reward = np.zeros((self.n_envs,))
 
@@ -1755,7 +1752,8 @@ class MyPPO_RND(ActorCriticRLModel):
 
 
 class Runner(AbstractEnvRunner):
-    def __init__(self, *, env, model, n_steps, gamma, lam, v_model, v1_model, is_mlp, use_victim_ob):
+    def __init__(self, *, env, model, n_steps, gamma, lam, v_model, v1_model,
+                 is_mlp, use_victim_ob, rnd_network, rnd_base_network):
         """
         A runner to learn the policy of an environment for a model
 
@@ -1770,6 +1768,8 @@ class Runner(AbstractEnvRunner):
         self.gamma = gamma
         self.v_model = v_model
         self.v1_model = v1_model
+        self.rnd_network = rnd_network
+        self.rnd_base_network = rnd_base_network
         self.is_mlp = is_mlp
 
         self.opp_states = v_model.initial_state
@@ -1807,8 +1807,11 @@ class Runner(AbstractEnvRunner):
         mb_abs_rewards = []
         mb_abs_values = []
 
+        mb_predicted_features = []
+        mb_target_features = []
+
         # mb_obs_oppo, mb_actions_oppo = [], []
-        for _ in range(self.n_steps):
+        for _ in range(self.n_steps): # n_step = 2048
             # self.obs (n_envs, obs_shape) self.dones (n_envs, 1)
             # actions (n_envs, action_shape) value(n_envs,) neglogpacs (n_envs, 1)
             actions, values, self.states, neglogpacs = self.model.step(self.obs, self.states, self.dones)
@@ -1843,6 +1846,13 @@ class Runner(AbstractEnvRunner):
             mb_opp_values.append(values_oppo)
             mb_abs_values.append(values_abs)
 
+            # calculate the rnd loss
+            predicted_features = self.rnd_base_network.value(obs_adv, self.states, self.dones)
+            target_features = self.rnd_network.value(obs_adv, self.states, self.dones)
+
+            mb_predicted_features.append(predicted_features)
+            mb_target_features.append(target_features)
+
             for info in infos:
                 maybe_ep_info = info.get('episode')
                 if maybe_ep_info is not None:
@@ -1858,6 +1868,10 @@ class Runner(AbstractEnvRunner):
 
         mb_opp_obs = np.asarray(mb_opp_obs, dtype=self.obs.dtype)
 
+        mb_target_features = np.asarray(mb_target_features, dtype=np.float32)
+        mb_predicted_features = np.asarray(mb_predicted_features, dtype=np.float32)
+        mb_intrinsic_value = 0.5 * (mb_predicted_features - mb_target_features) ** 2
+
         if not self.is_mlp:
             mb_opp_states = np.asarray(mb_opp_states, dtype=np.float32)
             mb_abs_states = np.asarray(mb_abs_states, dtype=np.float32)
@@ -1869,6 +1883,9 @@ class Runner(AbstractEnvRunner):
         mb_abs_rewards = np.asarray(mb_abs_rewards, dtype=np.float32)
 
         last_values = self.model.value(self.obs, self.states, self.dones)
+        last_predicted_features = self.rnd_base_network.value(self.obs, self.states, self.dones)
+        last_target_features = self.rnd_network.value(self.obs, self.states, self.dones)
+        intrinsic_last_reward = 0.5 * (last_predicted_features - last_target_features) ** 2
 
         if self.use_victim_ob:
             opp_last_values, _ = self.v_model.value(np.asarray(self.env.get_attr('oppo_ob_next').copy()), self.opp_states, self.dones)
@@ -1880,13 +1897,18 @@ class Runner(AbstractEnvRunner):
         mb_advs = np.zeros_like(mb_rewards)
         mb_opp_advs = np.zeros_like(mb_opp_rewards)
         mb_abs_advs = np.zeros_like(mb_abs_rewards)
+        # mb_rnd_reward = np.zeros_like(mb_intrinsic_reward)
+
 
         true_reward = np.copy(mb_rewards)
         opp_true_reward = np.copy(mb_opp_rewards)
         abs_true_reward = np.copy(mb_abs_rewards)
+        # rnd_true_reward = np.copy(mb_intrinsic_reward)
+
         last_gae_lam = 0
         opp_last_gae_lam = 0
         abs_last_gae_lam = 0
+        rnd_last_gae_lam = 0
 
         for step in reversed(range(self.n_steps)):
             if step == self.n_steps - 1:
@@ -1894,11 +1916,13 @@ class Runner(AbstractEnvRunner):
                 nextvalues = last_values
                 opp_nextvalues = opp_last_values
                 abs_nextvalues = abs_last_values
+                rnd_nextvalues = intrinsic_last_reward
             else:
                 nextnonterminal = 1.0 - mb_dones[step + 1]
                 nextvalues = mb_values[step + 1]
                 opp_nextvalues = mb_opp_values[step + 1]
                 abs_nextvalues = mb_abs_values[step + 1]
+                rnd_nextvalues = mb_intrinsic_reward[step + 1]
 
             delta = mb_rewards[step] + self.gamma * nextvalues * nextnonterminal - mb_values[step]
             mb_advs[step] = last_gae_lam = delta + self.gamma * self.lam * nextnonterminal * last_gae_lam
@@ -1907,6 +1931,9 @@ class Runner(AbstractEnvRunner):
             mb_opp_advs[step] = opp_last_gae_lam = opp_delta + self.gamma * self.lam * nextnonterminal * opp_last_gae_lam
 
             abs_delta = mb_abs_rewards[step] + self.gamma * abs_nextvalues * nextnonterminal - mb_abs_values[step]
+            mb_abs_advs[step] = abs_last_gae_lam = abs_delta + self.gamma * self.lam * nextnonterminal * abs_last_gae_lam
+
+            rnd_delta = mb_intrinsic_reward[step] + self.gamma * rnd_nextvalues * nextnonterminal - mb_intrinsic_value[step]
             mb_abs_advs[step] = abs_last_gae_lam = abs_delta + self.gamma * self.lam * nextnonterminal * abs_last_gae_lam
 
         mb_returns = mb_advs + mb_values

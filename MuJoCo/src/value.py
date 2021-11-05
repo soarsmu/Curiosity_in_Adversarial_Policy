@@ -300,12 +300,17 @@ class FeedForwardPolicy(ActorCriticPolicy):
                     vf_latent = act_fun(linear(vf_latent, 'pi_fc' + str(i), n_hidden=layer_size,
                                                         init_scale=np.sqrt(2)))
             self._value_fn = linear(vf_latent, 'vf', 1)
+            self._rnd_fn = linear(vf_latent, 'rnd', 1)
+
 
         self._setup_init()
 
     def value(self, obs, state=None, mask=None):
         v = self.sess.run(self.value_flat, {self.obs_ph: obs})
         return v, state
+
+    def rnd_value(self, obs, state=None, mask=None):
+        pass
 
     def proba_step(self, obs, state=None, mask=None):
         pass
@@ -382,7 +387,7 @@ class RNDFeedForward(ActorCriticPolicy):
 
     def value(self, obs, state=None, mask=None):
         v = self.sess.run(self.value_flat, {self.obs_ph: obs})
-        return v, state
+        return v
 
     def proba_step(self, obs, state=None, mask=None):
         pass
