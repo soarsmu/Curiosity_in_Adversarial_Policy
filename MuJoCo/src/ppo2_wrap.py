@@ -1071,28 +1071,6 @@ class MyPPO_RND(ActorCriticRLModel):
                         train_model = self.policy(self.sess, self.observation_space, self.action_space,
                                                   self.n_envs // self.nminibatches, self.n_steps, n_batch_train,
                                                   reuse=True, **self.policy_kwargs)
-                    # if issubclass(self.policy, MlpPolicyValue):
-                    #     act_model = self.policy(scope="victim_policy", reuse=False,
-                    #                         ob_space=self.observation_space,
-                    #                         ac_space=self.action_space,
-                    #                         hiddens=[64, 64], normalize=False)
-                    #     with tf.variable_scope("train_model", reuse=True,
-                    #                            custom_getter=tf_util.outer_scope_getter("train_model")):
-                    #         train_model = self.policy(scope="victim_policy", reuse=True,
-                    #                                   ob_space=self.observation_space,
-                    #                                   ac_space=self.action_space,
-                    #                                   hiddens=[64, 64], normalize=False)
-                    # else:
-                    #     act_model = self.policy(scope="victim_policy", reuse=False,
-                    #                             ob_space=self.observation_space,
-                    #                             ac_space=self.action_space,
-                    #                             hiddens=[128, 128], normalize=False)
-                    #     with tf.variable_scope("train_model", reuse=True,
-                    #                            custom_getter=tf_util.outer_scope_getter("train_model")):
-                    #         train_model = self.policy(scope="victim_policy", reuse=True,
-                    #                                   ob_space=self.observation_space,
-                    #                                   ac_space=self.action_space,
-                    #                                   hiddens=[128, 128], normalize=False)
 
                 # Define victim value function model
                 with tf.variable_scope("value_model", reuse=tf.AUTO_REUSE):
@@ -1111,14 +1089,12 @@ class MyPPO_RND(ActorCriticRLModel):
 
 
                 # Define RND base network and RND network
-                rnd_base_network = RndValue(self.sess, self.observation_space, self.action_space,
-                                                   self.n_envs // self.nminibatches, self.n_steps,
-                                                   n_batch_train)
+                rnd_base_network = RndValue(self.sess, self.observation_space, self.action_space, self.n_envs, 1,
+                                                 n_batch_step)
 
                 with tf.variable_scope("rnd_model", reuse=tf.AUTO_REUSE):
-                    rnd_network = RndValue(self.sess, self.observation_space, self.action_space,
-                                                   self.n_envs // self.nminibatches, self.n_steps,
-                                                   n_batch_train)
+                    rnd_network = RndValue(self.sess, self.observation_space, self.action_space, self.n_envs, 1,
+                                                 n_batch_step)
 
                     # how to define this
                     rnd_value = RndValue(self.sess, self.observation_space, self.action_space,
@@ -1158,6 +1134,7 @@ class MyPPO_RND(ActorCriticRLModel):
                     self.intrinsic_advs_ph = tf.placeholder(tf.float32, [None], name="intrinsic_advs_ph")
                     self.intrinsic_rewards_ph = tf.placeholder(tf.float32, [None], name="intrinsic_rewards_ph")
                     self.old_intrinsic_vpred_ph = tf.placeholder(tf.float32, [None], name="old_intrinsic_vpred_ph")
+                    self.predict_features = tf.placeholder(tf.float32, [None], name="predict_features")
 
 
                     neglogpac = train_model.proba_distribution.neglogp(self.action_ph)  # (n_step*n_envs//minibatch)
@@ -1173,9 +1150,10 @@ class MyPPO_RND(ActorCriticRLModel):
                     vf_losses1 = tf.square(vpred - self.rewards_ph)
                     vf_losses2 = tf.square(vpredclipped - self.rewards_ph)
 
-                    predict_features = rnd_base_network.value_flat
                     target_features = rnd_network.value_flat
-                    self.rnd_loss = .5 * tf.square(predict_features - target_features)
+                    # target_features = rnd_network.value_flat
+                    # self.rnd_loss = .5 * tf.square(predict_features - target_features)
+                    self.rnd_loss = .5 * tf.square(target_features - self.predict_features)
 
                     self.vf_loss = .5 * tf.reduce_mean(tf.maximum(vf_losses1, vf_losses2))
 
@@ -1358,7 +1336,7 @@ class MyPPO_RND(ActorCriticRLModel):
     def _train_step(self, learning_rate, cliprange, coef_opp, coef_adv, coef_abs, obs, returns, masks, actions, values,
                     neglogpacs,
                     opp_obs, opp_returns, opp_values, abs_returns, abs_values,
-                    intrinsic_returns, intrinsic_values,
+                    intrinsic_returns, intrinsic_values, predict_values,
                     update, writer,
                     states=None, opp_states=None, abs_states=None):
         """
@@ -1442,12 +1420,18 @@ class MyPPO_RND(ActorCriticRLModel):
                       self.vtrain_model.obs_ph: opp_obs,
                       self.intrinsic_advs_ph: intrinsic_advs,
                       self.intrinsic_rewards_ph: intrinsic_returns,
-                      self.old_intrinsic_vpred_ph: intrinsic_values}
+                      self.old_intrinsic_vpred_ph: intrinsic_values,
+                      self.predict_features: predict_values,
+                      self.rnd_network.obs_ph: obs,
+                      self.rnd_base_network.obs_ph: obs,
+                      self.rnd_value.obs_ph: obs}
 
 
             if states is not None:
                 td_map[self.train_model.states_ph] = states  # (n_nev//mini_batch, hidden)
                 td_map[self.train_model.dones_ph] = masks  # (n_envs*n_step//minibatch, )
+
+
 
         if opp_states is not None:
             td_map[self.vtrain_model.states_ph] = opp_states
@@ -1547,7 +1531,7 @@ class MyPPO_RND(ActorCriticRLModel):
                 cliprangenow = self.cliprange(0)
                 # true_reward is the reward without discount
                 obs, returns, masks, actions, values, neglogpacs, states, ep_infos, true_reward, opp_true_reward, \
-                abs_true_reward, opp_obs, opp_states, opp_returns, opp_values, abs_states, abs_returns, abs_values, intrinsic_return, intrinsic_value \
+                abs_true_reward, opp_obs, opp_states, opp_returns, opp_values, abs_states, abs_returns, abs_values, intrinsic_return, intrinsic_value, predict_feature \
                     = runner.run()
                 # obs (n_envs*n_steps, 137), returns (n_envs*n_steps, ), masks (n_envs*n_steps, ), actions (n_envs*n_steps, ac_space), values (n_envs*n_steps, ), neglogpacs (n_envs*n_steps, ), states (n_envs, 512), true_reward, opp_true_reward, abs_true_reward, opp_obs, opp_states, opp_returns, opp_values, abs_states, abs_returns, abs_values
                 ep_info_buf.extend(ep_infos)
@@ -1566,7 +1550,7 @@ class MyPPO_RND(ActorCriticRLModel):
                             slices = (arr[mbinds] for arr in (obs, returns, masks, actions, values, neglogpacs))
                             slices_victim = (arr[mbinds] for arr in
                                              (opp_obs, opp_returns, opp_values, abs_returns, abs_values))
-                            slice_intrinsic_return = (arr[mbinds] for arr in (intrinsic_return, intrinsic_value))
+                            slice_intrinsic_return = (arr[mbinds] for arr in (intrinsic_return, intrinsic_value, predict_feature))
 
 
                             mb_loss_vals.append(
@@ -1662,6 +1646,7 @@ class MyPPO_RND(ActorCriticRLModel):
                     logger.logkv("diff_loss_weight", np.mean(coef_abs_now))
 
                     logger.logkv("explained_variance", float(explained_var))
+
 
                     # print the attention weights
                     if len(ep_info_buf) > 0 and len(ep_info_buf[0]) > 0:
@@ -1962,12 +1947,14 @@ class Runner(AbstractEnvRunner):
 
         # attack the rewards and opp_returns
         mb_obs, mb_returns, mb_dones, mb_actions, mb_values, mb_neglogpacs, true_reward, opp_true_reward, abs_true_reward, \
-        mb_opp_obs, mb_opp_returns, mb_opp_values, mb_abs_returns, mb_abs_values, mb_intrinsic_returns, mb_intrinsic_value = \
+        mb_opp_obs, mb_opp_returns, mb_opp_values, mb_abs_returns, mb_abs_values, mb_intrinsic_returns, mb_intrinsic_value, mb_predicted_features = \
             map(swap_and_flatten, (mb_obs, mb_returns, mb_dones, mb_actions, mb_values, mb_neglogpacs, true_reward, opp_true_reward, \
-                                   abs_true_reward, mb_opp_obs, mb_opp_returns, mb_opp_values, mb_abs_returns, mb_abs_values,mb_intrinsic_returns, mb_intrinsic_value))
+                                   abs_true_reward, mb_opp_obs, mb_opp_returns, mb_opp_values, mb_abs_returns, mb_abs_values, \
+                                   mb_intrinsic_returns, mb_intrinsic_value, mb_predicted_features))
 
         return mb_obs, mb_returns, mb_dones, mb_actions, mb_values, mb_neglogpacs, mb_states, ep_infos, true_reward, opp_true_reward, \
-               abs_true_reward, mb_opp_obs, mb_opp_states, mb_opp_returns, mb_opp_values, mb_abs_states, mb_abs_returns, mb_abs_values, mb_intrinsic_returns, mb_intrinsic_value
+               abs_true_reward, mb_opp_obs, mb_opp_states, mb_opp_returns, mb_opp_values, mb_abs_states, mb_abs_returns, mb_abs_values, mb_intrinsic_returns, mb_intrinsic_value, \
+               mb_predicted_features
 
 
 def get_schedule_fn(value_schedule, schedule):
