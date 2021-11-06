@@ -1153,7 +1153,7 @@ class MyPPO_RND(ActorCriticRLModel):
                     target_features = rnd_network.value_flat
                     # target_features = rnd_network.value_flat
                     # self.rnd_loss = .5 * tf.square(predict_features - target_features)
-                    self.rnd_loss = .5 * tf.square(target_features - self.predict_features)
+                    self.rnd_loss = .5 * tf.reduce_mean(tf.square(target_features - self.predict_features))
 
                     self.vf_loss = .5 * tf.reduce_mean(tf.maximum(vf_losses1, vf_losses2))
 
