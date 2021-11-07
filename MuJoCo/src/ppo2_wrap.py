@@ -1098,8 +1098,8 @@ class MyPPO_RND(ActorCriticRLModel):
 
                     # how to define this
                     rnd_value = RndValue(self.sess, self.observation_space, self.action_space,
-                                                   self.n_envs // self.nminibatches, self.n_steps,
-                                                   n_batch_train)
+                                         self.n_envs // self.nminibatches, self.n_steps,
+                                         n_batch_train)
 
 
 
@@ -1155,7 +1155,14 @@ class MyPPO_RND(ActorCriticRLModel):
                     # self.rnd_loss = .5 * tf.square(predict_features - target_features)
                     self.rnd_loss = .5 * tf.reduce_mean(tf.square(target_features - self.predict_features))
 
-                    self.vf_loss = .5 * tf.reduce_mean(tf.maximum(vf_losses1, vf_losses2))
+                    # rnd_value_loss
+                    rnd_vpred = rnd_value.value_flat
+                    rnd_vpredclipped = self.old_intrinsic_vpred_ph + tf.clip_by_value(
+                        rnd_value.value_flat - self.old_intrinsic_vpred_ph, - self.clip_range_ph, self.clip_range_ph)
+                    rnd_vf_losses1 = tf.square(rnd_vpred - self.intrinsic_rewards_ph)
+                    rnd_vf_losses2 = tf.square(rnd_vpredclipped - self.intrinsic_rewards_ph)
+                    self.rnd_vf_loss = .5 * tf.reduce_mean(tf.maximum(rnd_vf_losses1, rnd_vf_losses2))
+                    self.vf_loss = .5 * tf.reduce_mean(tf.maximum(vf_losses1, vf_losses2)) + self.rnd_vf_loss
 
                     # victim agent value function loss
                     opp_vpred = vtrain_model.value_flat
@@ -1423,7 +1430,6 @@ class MyPPO_RND(ActorCriticRLModel):
                       self.old_intrinsic_vpred_ph: intrinsic_values,
                       self.predict_features: predict_values,
                       self.rnd_network.obs_ph: obs,
-                      self.rnd_base_network.obs_ph: obs,
                       self.rnd_value.obs_ph: obs}
 
 
