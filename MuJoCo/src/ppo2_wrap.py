@@ -1461,7 +1461,7 @@ class MyPPO_RND(ActorCriticRLModel):
         return policy_loss, value_loss, policy_entropy, approxkl, clipfrac, \
                opp_vf_loss, opp_pg_loss, adv_pg_loss, abs_pg_loss, rnd_loss
 
-    def learn(self, total_timesteps, callback=None, seed=None, log_interval=1, tb_log_name="PPO2",
+    def learn(self, total_timesteps, callback=None, seed=None, log_interval=1, tb_log_name="PPO_RND",
               reset_num_timesteps=True, use_victim_ob=False):
 
         # Transform to callable if needed
@@ -1832,6 +1832,15 @@ class Runner(AbstractEnvRunner):
             dones = self.dones.copy()
             obs_adv = np.copy(self.obs)
 
+            # calculate the rnd loss
+            predicted_features = self.rnd_base_network.value(self.obs, self.states, self.dones)
+            target_features = self.rnd_network.value(self.obs, self.states, self.dones)
+            intrinsic_value = self.rnd_value.value(self.obs, self.states, self.dones)
+
+            mb_predicted_features.append(predicted_features)
+            mb_target_features.append(target_features)
+            mb_intrinsic_value.append(intrinsic_value)
+
             clipped_actions = actions
             # Clip the actions to avoid out of bound error
             if isinstance(self.env.action_space, gym.spaces.Box):
@@ -1854,15 +1863,6 @@ class Runner(AbstractEnvRunner):
 
             mb_opp_values.append(values_oppo)
             mb_abs_values.append(values_abs)
-
-            # calculate the rnd loss
-            predicted_features = self.rnd_base_network.value(obs_adv, self.states, self.dones)
-            target_features = self.rnd_network.value(obs_adv, self.states, self.dones)
-            intrinsic_value = self.rnd_value.value(obs_adv, self.states, self.dones)
-
-            mb_predicted_features.append(predicted_features)
-            mb_target_features.append(target_features)
-            mb_intrinsic_value.append(intrinsic_value)
 
             for info in infos:
                 maybe_ep_info = info.get('episode')

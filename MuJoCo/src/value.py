@@ -120,12 +120,14 @@ class ActorCriticPolicy(BasePolicy):
         super(ActorCriticPolicy, self).__init__(sess, ob_space, ac_space, n_env, n_steps, n_batch, reuse=reuse,
                                                 scale=scale)
         self._value_fn = None
+        self._rnd_fn = None
         self._action = None
 
     def _setup_init(self):
         """Sets up the distributions, actions, and value."""
         with tf.variable_scope("output", reuse=True):
             self._value_flat = self.value_fn[:, 0]
+            # self._rnd_flat = self.rnd_fn[:, 0]
 
     @property
     def value_fn(self):
@@ -136,6 +138,15 @@ class ActorCriticPolicy(BasePolicy):
     def value_flat(self):
         """tf.Tensor: value estimate, of shape (self.n_batch, )"""
         return self._value_flat
+
+    def rnd_fn(self):
+        """tf.Tensor: value estimate, of shape (self.n_batch, 1)"""
+        return self._rnd_fn
+
+    @property
+    def rnd_flat(self):
+        """tf.Tensor: value estimate, of shape (self.n_batch, )"""
+        return self._rnd_flat
 
     @property
     def action(self):
@@ -300,6 +311,7 @@ class FeedForwardPolicy(ActorCriticPolicy):
                     vf_latent = act_fun(linear(vf_latent, 'pi_fc' + str(i), n_hidden=layer_size,
                                                         init_scale=np.sqrt(2)))
             self._value_fn = linear(vf_latent, 'vf', 1)
+            # self._rnd_fn = linear(vf_latent, 'rnd', 1)
 
         self._setup_init()
 
@@ -308,7 +320,8 @@ class FeedForwardPolicy(ActorCriticPolicy):
         return v, state
 
     def rnd_value(self, obs, state=None, mask=None):
-        pass
+        v = self.sess.run(self.value_flat, {self.obs_ph: obs})
+        return v, state
 
     def proba_step(self, obs, state=None, mask=None):
         pass
@@ -379,7 +392,7 @@ class RNDFeedForward(ActorCriticPolicy):
                 for i, layer_size in enumerate(layers):
                     rnd_latent = act_fun(linear(rnd_latent, 'rnd_fc' + str(i), n_hidden=layer_size,
                                                         init_scale=np.sqrt(2)))
-            self._value_fn = linear(rnd_latent, 'rnd', 1)
+            self._value_fn = linear(rnd_latent, 'rnd_', 1)
 
         self._setup_init()
 
