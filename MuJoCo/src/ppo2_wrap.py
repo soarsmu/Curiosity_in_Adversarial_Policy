@@ -946,6 +946,7 @@ class MyPPO_RND(ActorCriticRLModel):
         self.vf_loss = None
         self.pg_loss = None
         self.rnd_loss = None
+        self.rnd_vf_loss = None
         self.approxkl = None
         self.clipfrac = None
         self.params = None
@@ -1072,6 +1073,10 @@ class MyPPO_RND(ActorCriticRLModel):
                                                   self.n_envs // self.nminibatches, self.n_steps, n_batch_train,
                                                   reuse=True, **self.policy_kwargs)
 
+                        rnd_model = self.policy(self.sess, self.observation_space, self.action_space,
+                                                  self.n_envs // self.nminibatches, self.n_steps, n_batch_train,
+                                                  reuse=True, **self.policy_kwargs)
+
                 # Define victim value function model
                 with tf.variable_scope("value_model", reuse=tf.AUTO_REUSE):
                     vact_model = self.opp_value(self.sess, self.observation_space, self.action_space, self.n_envs, 1,
@@ -1097,9 +1102,9 @@ class MyPPO_RND(ActorCriticRLModel):
                                                  n_batch_step)
 
                     # how to define this
-                    rnd_value = RndValue(self.sess, self.observation_space, self.action_space,
-                                         self.n_envs // self.nminibatches, self.n_steps,
-                                         n_batch_train)
+                    # rnd_value = RndValue(self.sess, self.observation_space, self.action_space,
+                    #                      self.n_envs // self.nminibatches, self.n_steps,
+                    #                      n_batch_train)
 
 
 
@@ -1153,16 +1158,16 @@ class MyPPO_RND(ActorCriticRLModel):
                     target_features = rnd_network.value_flat
                     # target_features = rnd_network.value_flat
                     # self.rnd_loss = .5 * tf.square(predict_features - target_features)
-                    self.rnd_loss = .5 * tf.reduce_mean(tf.square(target_features - self.predict_features))
+                    self.rnd_loss = .5 * tf.reduce_mean(tf.square(target_features - tf.stop_gradient(self.predict_features)))
 
                     # rnd_value_loss
-                    rnd_vpred = rnd_value.value_flat
+                    rnd_vpred = rnd_model.value_flat
                     rnd_vpredclipped = self.old_intrinsic_vpred_ph + tf.clip_by_value(
-                        rnd_value.value_flat - self.old_intrinsic_vpred_ph, - self.clip_range_ph, self.clip_range_ph)
+                        rnd_model.value_flat - self.old_intrinsic_vpred_ph, - self.clip_range_ph, self.clip_range_ph)
                     rnd_vf_losses1 = tf.square(rnd_vpred - self.intrinsic_rewards_ph)
                     rnd_vf_losses2 = tf.square(rnd_vpredclipped - self.intrinsic_rewards_ph)
                     self.rnd_vf_loss = .5 * tf.reduce_mean(tf.maximum(rnd_vf_losses1, rnd_vf_losses2))
-                    self.vf_loss = .5 * tf.reduce_mean(tf.maximum(vf_losses1, vf_losses2)) + self.rnd_vf_loss
+                    self.vf_loss = .5 * tf.reduce_mean(tf.maximum(vf_losses1, vf_losses2))
 
                     # victim agent value function loss
                     opp_vpred = vtrain_model.value_flat
@@ -1212,6 +1217,7 @@ class MyPPO_RND(ActorCriticRLModel):
                                                                       self.clip_range_ph), tf.float32))
                     # final ppo loss
                     loss = self.pg_loss - self.entropy * self.ent_coef + self.vf_loss * self.vf_coef
+                    loss += 0.1 * (tf.norm(loss, 2)/tf.norm(self.rnd_vf_loss, 2)) * self.rnd_vf_loss
 
                     tf.summary.scalar('entropy_loss', self.entropy)
                     tf.summary.scalar('policy_gradient_loss', self.pg_loss)
@@ -1220,6 +1226,7 @@ class MyPPO_RND(ActorCriticRLModel):
                     tf.summary.scalar('clip_factor', self.clipfrac)
                     tf.summary.scalar('loss', loss)
                     tf.summary.scalar('rnd_loss', self.rnd_loss)
+                    tf.summary.scalar('rnd_vf_loss', (tf.norm(loss, 2)/tf.norm(self.rnd_vf_loss, 2)) * self.rnd_vf_loss)
                     if self.retrain_vicitim and not self.use_baseline_policy:
                         if self.env_name == 'multicomp/YouShallNotPassHumans-v0':
                             params = tf_util.get_trainable_vars("victim_policy")
@@ -1271,7 +1278,7 @@ class MyPPO_RND(ActorCriticRLModel):
                 self._train_rnd = trainer_rnd.apply_gradients(grads_rnd)
 
                 self.loss_names = ['policy_loss', 'value_loss', 'policy_entropy', 'approxkl', 'clipfrac',
-                                   '_opp_value_loss', 'opp_policy_loss', 'adv_policy_loss', 'abs_policy_loss', 'rnd_loss']
+                                   '_opp_value_loss', 'opp_policy_loss', 'adv_policy_loss', 'abs_policy_loss', 'rnd_loss', 'rnd_vf_loss']
 
                 with tf.variable_scope("input_info", reuse=False):
                     tf.summary.scalar('discounted_rewards', tf.reduce_mean(self.rewards_ph))
@@ -1305,7 +1312,7 @@ class MyPPO_RND(ActorCriticRLModel):
 
                 self.rnd_base_network = rnd_base_network
                 self.rnd_network = rnd_network
-                self.rnd_value = rnd_value
+                self.rnd_model = rnd_model
 
                 self.step = act_model.step
                 self.proba_step = act_model.proba_step
@@ -1430,7 +1437,7 @@ class MyPPO_RND(ActorCriticRLModel):
                       self.old_intrinsic_vpred_ph: intrinsic_values,
                       self.predict_features: predict_values,
                       self.rnd_network.obs_ph: obs,
-                      self.rnd_value.obs_ph: obs}
+                      self.rnd_model.obs_ph: obs}
 
 
             if states is not None:
@@ -1454,12 +1461,12 @@ class MyPPO_RND(ActorCriticRLModel):
 
         assert (writer == None, print('only support none writer'))
         policy_loss, value_loss, policy_entropy, approxkl, clipfrac, _, \
-        _, opp_vf_loss, opp_pg_loss, adv_pg_loss, abs_pg_loss, rnd_loss = self.sess.run(
+        _, opp_vf_loss, opp_pg_loss, adv_pg_loss, abs_pg_loss, rnd_loss, rnd_vf_loss = self.sess.run(
             [self.pg_loss, self.vf_loss, self.entropy, self.approxkl, self.clipfrac, self._train,
-             self._train_value, self.opp_vf_loss, self.opp_pg_loss, self.adv_pg_loss, self.abs_pg_loss, self.rnd_loss], td_map)
+             self._train_value, self.opp_vf_loss, self.opp_pg_loss, self.adv_pg_loss, self.abs_pg_loss, self.rnd_loss, self.rnd_vf_loss], td_map)
 
         return policy_loss, value_loss, policy_entropy, approxkl, clipfrac, \
-               opp_vf_loss, opp_pg_loss, adv_pg_loss, abs_pg_loss, rnd_loss
+               opp_vf_loss, opp_pg_loss, adv_pg_loss, abs_pg_loss, rnd_loss, rnd_vf_loss
 
     def learn(self, total_timesteps, callback=None, seed=None, log_interval=1, tb_log_name="PPO_RND",
               reset_num_timesteps=True, use_victim_ob=False):
@@ -1494,7 +1501,7 @@ class MyPPO_RND(ActorCriticRLModel):
             runner = Runner(env=self.env, model=self, n_steps=self.n_steps, gamma=self.gamma,
                             lam=self.lam, v_model=self.vact_model, v1_model=self.vact1_model,
                             is_mlp=self.is_mlp, use_victim_ob=use_victim_ob, rnd_network=self.rnd_network,
-                            rnd_base_network=self.rnd_base_network, rnd_value=self.rnd_value)
+                            rnd_base_network=self.rnd_base_network, rnd_model=self.rnd_model)
 
             self.episode_reward = np.zeros((self.n_envs,))
 
@@ -1760,7 +1767,7 @@ class MyPPO_RND(ActorCriticRLModel):
 
 class Runner(AbstractEnvRunner):
     def __init__(self, *, env, model, n_steps, gamma, lam, v_model, v1_model,
-                 is_mlp, use_victim_ob, rnd_network, rnd_base_network, rnd_value):
+                 is_mlp, use_victim_ob, rnd_network, rnd_base_network, rnd_model):
         """
         A runner to learn the policy of an environment for a model
 
@@ -1777,7 +1784,7 @@ class Runner(AbstractEnvRunner):
         self.v1_model = v1_model
         self.rnd_network = rnd_network
         self.rnd_base_network = rnd_base_network
-        self.rnd_value = rnd_value
+        self.rnd_model = rnd_model
         self.is_mlp = is_mlp
 
         self.opp_states = v_model.initial_state
@@ -1835,7 +1842,7 @@ class Runner(AbstractEnvRunner):
             # calculate the rnd loss
             predicted_features = self.rnd_base_network.value(self.obs, self.states, self.dones)
             target_features = self.rnd_network.value(self.obs, self.states, self.dones)
-            intrinsic_value = self.rnd_value.value(self.obs, self.states, self.dones)
+            intrinsic_value = self.rnd_model.value(self.obs, self.states, self.dones)
 
             mb_predicted_features.append(predicted_features)
             mb_target_features.append(target_features)
@@ -1895,7 +1902,7 @@ class Runner(AbstractEnvRunner):
         mb_abs_rewards = np.asarray(mb_abs_rewards, dtype=np.float32)
 
         last_values = self.model.value(self.obs, self.states, self.dones)
-        last_intrinsic_value = self.rnd_value.value(self.obs, self.states, self.dones)
+        last_intrinsic_value = self.rnd_model.value(self.obs, self.states, self.dones)
 
         if self.use_victim_ob:
             opp_last_values, _ = self.v_model.value(np.asarray(self.env.get_attr('oppo_ob_next').copy()), self.opp_states, self.dones)
