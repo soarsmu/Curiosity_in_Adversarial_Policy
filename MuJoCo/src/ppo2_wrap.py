@@ -1166,7 +1166,8 @@ class MyPPO_RND(ActorCriticRLModel):
                         rnd_model.value_flat - self.old_intrinsic_vpred_ph, - self.clip_range_ph, self.clip_range_ph)
                     rnd_vf_losses1 = tf.square(rnd_vpred - self.intrinsic_rewards_ph)
                     rnd_vf_losses2 = tf.square(rnd_vpredclipped - self.intrinsic_rewards_ph)
-                    self.rnd_vf_loss = .5 * tf.reduce_mean(tf.maximum(rnd_vf_losses1, rnd_vf_losses2))
+                    # self.rnd_vf_loss = .5 * tf.reduce_mean(tf.maximum(rnd_vf_losses1, rnd_vf_losses2))
+                    self.rnd_vf_loss = .5 * tf.reduce_mean(rnd_vf_losses1)
                     self.vf_loss = .5 * tf.reduce_mean(tf.maximum(vf_losses1, vf_losses2))
 
                     # victim agent value function loss
@@ -1217,7 +1218,7 @@ class MyPPO_RND(ActorCriticRLModel):
                                                                       self.clip_range_ph), tf.float32))
                     # final ppo loss
                     loss = self.pg_loss - self.entropy * self.ent_coef + self.vf_loss * self.vf_coef
-                    loss += 0.1 * (tf.norm(loss, 2)/tf.norm(self.rnd_vf_loss, 2)) * self.rnd_vf_loss
+                    loss -= 0.01 * (tf.norm(loss, 2)/tf.norm(self.rnd_vf_loss, 2)) * self.rnd_vf_loss
 
                     tf.summary.scalar('entropy_loss', self.entropy)
                     tf.summary.scalar('policy_gradient_loss', self.pg_loss)
