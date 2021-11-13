@@ -1166,8 +1166,8 @@ class MyPPO_RND(ActorCriticRLModel):
                         rnd_model.value_flat - self.old_intrinsic_vpred_ph, - self.clip_range_ph, self.clip_range_ph)
                     rnd_vf_losses1 = tf.square(rnd_vpred - self.intrinsic_rewards_ph)
                     rnd_vf_losses2 = tf.square(rnd_vpredclipped - self.intrinsic_rewards_ph)
-                    # self.rnd_vf_loss = .5 * tf.reduce_mean(tf.maximum(rnd_vf_losses1, rnd_vf_losses2))
-                    self.rnd_vf_loss = .5 * tf.reduce_mean(rnd_vf_losses1)
+                    self.rnd_vf_loss = .5 * tf.reduce_mean(tf.maximum(rnd_vf_losses1, rnd_vf_losses2))
+                    # self.rnd_vf_loss = .5 * tf.reduce_mean(rnd_vf_losses1)
                     self.vf_loss = .5 * tf.reduce_mean(tf.maximum(vf_losses1, vf_losses2))
 
                     # victim agent value function loss
@@ -1218,7 +1218,8 @@ class MyPPO_RND(ActorCriticRLModel):
                                                                       self.clip_range_ph), tf.float32))
                     # final ppo loss
                     loss = self.pg_loss - self.entropy * self.ent_coef + self.vf_loss * self.vf_coef
-                    loss -= 0.01 * (tf.norm(loss, 2)/tf.norm(self.rnd_vf_loss, 2)) * self.rnd_vf_loss
+                    # loss += 0.01 * (tf.norm(loss, 2)/tf.norm(self.rnd_vf_loss, 2)) * self.rnd_vf_loss
+                    loss += self.vf_coef * self.rnd_vf_loss
 
                     tf.summary.scalar('entropy_loss', self.entropy)
                     tf.summary.scalar('policy_gradient_loss', self.pg_loss)
@@ -1462,9 +1463,10 @@ class MyPPO_RND(ActorCriticRLModel):
 
         assert (writer == None, print('only support none writer'))
         policy_loss, value_loss, policy_entropy, approxkl, clipfrac, _, \
-        _, opp_vf_loss, opp_pg_loss, adv_pg_loss, abs_pg_loss, rnd_loss, rnd_vf_loss = self.sess.run(
+        _, _, opp_vf_loss, opp_pg_loss, adv_pg_loss, abs_pg_loss, rnd_loss, rnd_vf_loss = self.sess.run(
             [self.pg_loss, self.vf_loss, self.entropy, self.approxkl, self.clipfrac, self._train,
-             self._train_value, self.opp_vf_loss, self.opp_pg_loss, self.adv_pg_loss, self.abs_pg_loss, self.rnd_loss, self.rnd_vf_loss], td_map)
+             self._train_value, self._train_rnd, self.opp_vf_loss, self.opp_pg_loss, self.adv_pg_loss, \
+             self.abs_pg_loss, self.rnd_loss, self.rnd_vf_loss], td_map)
 
         return policy_loss, value_loss, policy_entropy, approxkl, clipfrac, \
                opp_vf_loss, opp_pg_loss, adv_pg_loss, abs_pg_loss, rnd_loss, rnd_vf_loss

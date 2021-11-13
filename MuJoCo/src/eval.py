@@ -1,4 +1,5 @@
 from zoo_utils import LSTMPolicy, MlpPolicyValue
+import os
 import gym
 import gym_compete
 import argparse
@@ -168,12 +169,12 @@ def run(config):
 
             if num_episodes < max_episodes:
                 print("-"*5 + "Episode %d" % (num_episodes+1) + "-"*5)
-
-    print('================')
-    print("Game win_0 %.2f" %float(total_scores[0]/max_episodes))
-    print("Game win_1 %.2f" %float(total_scores[1]/max_episodes))
-    print("Game tie %.2f" %float((max_episodes - total_scores[0] - total_scores[1])/max_episodes))
-    print('================')
+    with open(config.log, 'a+') as f:
+        #print('================')
+        f.write("Game win_0 :%.2f\n" %float(total_scores[0]/max_episodes))
+        f.write("Game win_1 :%.2f\n" %float(total_scores[1]/max_episodes))
+        f.write("Game tie :%.2f\n" %float((max_episodes - total_scores[0] - total_scores[1])/max_episodes))
+#        print('================')
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(description="Environments for Multi-agent competition")
@@ -182,22 +183,29 @@ if __name__ == "__main__":
     p.add_argument("--clip_obs", default=10, type=float)
 
     ## Kick And Defend
-    # p.add_argument("--env", default=3, type=int) # 2: YouShallNotPass # 3: KickAndDefend # 4: SumoAnts # 5: SumoHumans
+    p.add_argument("--env", default=4, type=int) # 2: YouShallNotPass # 3: KickAndDefend # 4: SumoAnts # 5: SumoHumans
 
     # victim-agent
 
     # zoo-victim
-    # p.add_argument("--pi0_type", default="our", type=str)
-    # p.add_argument("--pi0_nn_type", default="lstm", type=str)
-    #
-    # p.add_argument("--pi0_path", default='/Users/Henryguo/Desktop/rl_newloss/MuJoCo/multiagent-competition/agent-zoo/kick-and-defend/kicker/agent1_parameters-v1.pkl', type=str)
-    # p.add_argument("--pi0_norm_path", default="/Users/Henryguo/Desktop/rl_newloss/MuJoCo/multiagent-competition/agent-zoo/kick-and-defend/kicker/agent1_parameters-v1.pkl", type=str)
-
-    # our retrained vic.
-    # p.add_argument("--pi0_path", default='/Users/Henryguo/Desktop/rl_newloss/MuJoCo/results/retrain_50/our_attack/high_capacity/KickAndDefend/20200818_124108-0/KickAndDefend-v0.npy', type=str)
+    p.add_argument("--pi0_type", default="our", type=str)
+    p.add_argument("--pi0_nn_type", default="lstm", type=str)
+    p.add_argument("--pi1_type", default="stable", type=str)
+    p.add_argument("--pi1_nn_type", default="mlp", type=str)
+    
+    p.add_argument("--pi0_path", type=str)
+    p.add_argument("--pi0_norm_path", type=str)
+    p.add_argument('--pi1_path', type=str)
+    p.add_argument('--pi1_norm_path', type=str)
+    p.add_argument('--log', type=str)
+    config = p.parse_args()    
+    run(config)
+   # our retrained vic.
+#    p.add_argument("--pi0_path", default='/Users/Henryguo/Desktop/rl_newloss/MuJoCo/results/retrain_50/our_attack/high_capacity/KickAndDefend/20200818_124108-0/KickAndDefend-v0.npy', type=str)
     # p.add_argument("--pi0_path", default='/Users/Henryguo/Desktop/rl_newloss/MuJoCo/results/retrain_50/our_attack/high_capacity/KickAndDefend/20200818_124119-1/KickAndDefend-v0.npy', type=str)
     # p.add_argument("--pi0_path", default='/Users/Henryguo/Desktop/rl_newloss/MuJoCo/results/retrain_50/our_attack/high_capacity/KickAndDefend/20200818_124130-2/KickAndDefend-v0.npy', type=str)
-    # p.add_argument("--pi0_norm_path", default="/Users/Henryguo/Desktop/rl_newloss/MuJoCo/multiagent-competition/agent-zoo/kick-and-defend/kicker/agent1_parameters-v1.pkl", type=str)
+
+#    p.add_argument("--pi0_norm_path", default="/Users/Henryguo/Desktop/rl_newloss/MuJoCo/multiagent-competition/agent-zoo/kick-and-defend/kicker/agent1_parameters-v1.pkl", type=str)
 
     # ucb retrained vic.
     # p.add_argument("--pi0_path", default='/Users/Henryguo/Desktop/rl_newloss/MuJoCo/results/retrain_50/ucb/KickAndDefend/20200819_150752-0/KickAndDefend-v0.npy', type=str)
@@ -206,16 +214,13 @@ if __name__ == "__main__":
     # p.add_argument("--pi0_norm_path", default="/Users/Henryguo/Desktop/rl_newloss/MuJoCo/multiagent-competition/agent-zoo/kick-and-defend/kicker/agent1_parameters-v1.pkl", type=str)
 
     # Adv agent
-    # p.add_argument("--pi1_type", default="stable", type=str)
-    # p.add_argument("--pi1_nn_type", default="mlp", type=str)
-
     # ucb adv.
     # p.add_argument("--pi1_path", default="/Users/Henryguo/Desktop/rl_newloss/MuJoCo/adv_agent-zoo/ucb/kick/model.npy", type=str)
     # p.add_argument("--pi1_norm_path", default="/Users/Henryguo/Desktop/rl_newloss/MuJoCo/adv_agent-zoo/ucb/kick/obs_rms.pkl", type=str)
 
     # our adv.
-    # p.add_argument("--pi1_path", default="/Users/Henryguo/Desktop/rl_newloss/MuJoCo/adv_agent-zoo/our_attack/kick/model.pkl", type=str)
-    # p.add_argument("--pi1_norm_path", default="/Users/Henryguo/Desktop/rl_newloss/MuJoCo/adv_agent-zoo/our_attack/kick/obs_rms.pkl", type=str)
+    #p.add_argument("--pi1_path", default="/Users/Henryguo/Desktop/rl_newloss/MuJoCo/adv_agent-zoo/our_attack/kick/model.pkl", type=str)
+   # p.add_argument("--pi1_norm_path", default="/Users/Henryguo/Desktop/rl_newloss/MuJoCo/adv_agent-zoo/our_attack/kick/obs_rms.pkl", type=str)
 
     # zoo-agent
     # p.add_argument("--pi1_type", default="our", type=str)
@@ -276,13 +281,13 @@ if __name__ == "__main__":
 
     # ## SumoHumans
     #
-    p.add_argument("--env", default=3, type=int) # 2: YouShallNotPass # 3: KickAndDefend # 4: SumoAnts # 5: SumoHumans
+#    p.add_argument("--env", default=5, type=int) # 2: YouShallNotPass # 3: KickAndDefend # 4: SumoAnts # 5: SumoHumans
 
     # victim-agent
 
     # zoo-victim
-    p.add_argument("--pi0_type", default="our", type=str)
-    p.add_argument("--pi0_nn_type", default="mlp", type=str)
+#    p.add_argument("--pi0_type", default="our", type=str)
+#    p.add_argument("--pi0_nn_type", default="lstm", type=str)
 
     # p.add_argument("--pi0_path", default='/Users/Henryguo/Desktop/rl_newloss/MuJoCo/multiagent-competition/agent-zoo/sumo/humans/agent_parameters-v3.pkl', type=str)
     # p.add_argument("--pi0_norm_path", default="/Users/Henryguo/Desktop/rl_newloss/MuJoCo/multiagent-competition/agent-zoo/sumo/humans/agent_parameters-v3.pkl", type=str)
@@ -293,15 +298,11 @@ if __name__ == "__main__":
     # p.add_argument("--pi0_path", default='/Users/Henryguo/Desktop/rl_newloss/MuJoCo/results/retrain_50/our_attack/high_capacity/SumoHumans/20200817_093313-2/SumoHumans-v0.npy', type=str)
     # p.add_argument("--pi0_norm_path", default="/Users/Henryguo/Desktop/rl_newloss/MuJoCo/multiagent-competition/agent-zoo/sumo/humans/agent_parameters-v3.pkl", type=str)
 
-    # # ucb retrained vic.
-    # p.add_argument("--pi0_path", default='/Users/Henryguo/Desktop/rl_newloss/MuJoCo/results/retrain_50/ucb/SumoHumans/20200820_175047-0/SumoHumans-v0.pkl', type=str)
-    # # p.add_argument("--pi0_path", default='/Users/Henryguo/Desktop/rl_newloss/MuJoCo/results/retrain_50/ucb/SumoHumans/20200820_175057-1/SumoHumans-v0.pkl', type=str)
-    # # p.add_argument("--pi0_path", default='/Users/Henryguo/Desktop/rl_newloss/MuJoCo/results/retrain_50/ucb/SumoHumans/20200820_175107-2/SumoHumans-v0.pkl', type=str)
-    # p.add_argument("--pi0_norm_path", default="/Users/Henryguo/Desktop/rl_newloss/MuJoCo/multiagent-competition/agent-zoo/sumo/humans/agent_parameters-v3.pkl", type=str)
-
-    p.add_argument("--pi0_path", default="/home/gc/attack_rl/rl_adv_valuediff/MuJoCo/retrained-victim/our_attack/KickAndDefend/20200818_124119-1/KickAndDefend-v0.pkl", type=str)
-    p.add_argument("--pi0_norm_path", default="/home/gc/attack_rl/rl_adv_valuediff/MuJoCo/retrained-victim/our_attack/KickAndDefend/20200818_124119-1/KickAndDefend-v0.npy", type=str)
-
+    # ucb retrained vic.
+#    p.add_argument("--pi0_path", default='/Users/Henryguo/Desktop/rl_newloss/MuJoCo/results/retrain_50/ucb/SumoHumans/20200820_175047-0/SumoHumans-v0.pkl', type=str)
+    # p.add_argument("--pi0_path", default='/Users/Henryguo/Desktop/rl_newloss/MuJoCo/results/retrain_50/ucb/SumoHumans/20200820_175057-1/SumoHumans-v0.pkl', type=str)
+    # p.add_argument("--pi0_path", default='/Users/Henryguo/Desktop/rl_newloss/MuJoCo/results/retrain_50/ucb/SumoHumans/20200820_175107-2/SumoHumans-v0.pkl', type=str)
+#    p.add_argument("--pi0_norm_path", default="/Users/Henryguo/Desktop/rl_newloss/MuJoCo/multiagent-competition/agent-zoo/sumo/humans/agent_parameters-v3.pkl", type=str)
 
     # zoo-agent
     # p.add_argument("--pi1_type", default="our", type=str)
@@ -311,19 +312,18 @@ if __name__ == "__main__":
     # p.add_argument("--pi1_norm_path", default="/Users/Henryguo/Desktop/rl_newloss/MuJoCo/multiagent-competition/agent-zoo/sumo/humans/agent_parameters-v1.pkl", type=str)
 
     # Adv agent
-    p.add_argument("--pi1_type", default="stable", type=str)
-    p.add_argument("--pi1_nn_type", default="mlp", type=str)
+#    p.add_argument("--pi1_type", default="stable", type=str)
+#    p.add_argument("--pi1_nn_type", default="mlp", type=str)
 
     # ucb adv.
-    # p.add_argument("--pi1_path", default="/Users/Henryguo/Desktop/rl_newloss/MuJoCo/adv_agent-zoo/ucb/humans/model.pkl", type=str)
-    # p.add_argument("--pi1_norm_path", default="/Users/Henryguo/Desktop/rl_newloss/MuJoCo/adv_agent-zoo/ucb/humans/obs_rms.pkl", type=str)
+#    p.add_argument("--pi1_path", default="/Users/Henryguo/Desktop/rl_newloss/MuJoCo/adv_agent-zoo/ucb/humans/model.pkl", type=str)
+#    p.add_argument("--pi1_norm_path", default="/Users/Henryguo/Desktop/rl_newloss/MuJoCo/adv_agent-zoo/ucb/humans/obs_rms.pkl", type=str)
 
     # our adv.
     # p.add_argument("--pi1_path", default="/Users/Henryguo/Desktop/rl_newloss/MuJoCo/adv_agent-zoo/our_attack/humans/model.pkl", type=str)
     # p.add_argument("--pi1_norm_path", default="/Users/Henryguo/Desktop/rl_newloss/MuJoCo/adv_agent-zoo/our_attack/humans/obs_rms.pkl", type=str)
 
-    p.add_argument("--pi1_path", default="/home/gc/attack_rl/rl_adv_valuediff/MuJoCo/agent-zoo/KickAndDefend-v0_1_MLP_MLP_1_const_-1_const_0_const_False/20211019_141916-2/model.pkl", type=str)
-    p.add_argument("--pi1_norm_path", default="/home/gc/attack_rl/rl_adv_valuediff/MuJoCo/agent-zoo/KickAndDefend-v0_1_MLP_MLP_1_const_-1_const_0_const_False/20211019_141916-2/obs_rms.pkl", type=str)
+
 
 
     ## SumoAnts
@@ -372,8 +372,5 @@ if __name__ == "__main__":
 
 
 
-
-    config = p.parse_args()
-    run(config)
 
 
