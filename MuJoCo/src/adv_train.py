@@ -10,7 +10,8 @@ from scheduling import ConstantAnnealer, Scheduler
 from shaping_wrappers import apply_reward_wrapper
 from environment import make_zoo_multi2single_env, Monitor
 from logger import setup_logger
-from ppo2_wrap import MyPPO2, MyPPO_RND
+from ppo2_wrap import MyPPO_RND
+from ppo2_ori import MyPPO2
 from value import MlpValue, MlpLstmValue
 # from common import get_zoo_path
 
@@ -20,13 +21,15 @@ from value import MlpValue, MlpLstmValue
 ##################
 parser = argparse.ArgumentParser()
 # game env
-parser.add_argument("--env", type=int, default=3)
+parser.add_argument("--env", type=int, default=1)
 # random seed
 parser.add_argument("--seed", type=int, default=0)
 # number of game environment. should be divisible by NBATCHES if using a LSTM policy
 parser.add_argument("--n_games", type=int, default=8) # N_GAME = 8
 # which victim agent to use
 parser.add_argument("--vic_agt_id", type=int, default=1)
+
+# 0: RuntoUpAnt
 
 # 2: YouShallNotPass
 # victim agent id: 1
@@ -70,6 +73,9 @@ parser.add_argument("--render", type=int, default=0)
 
 # the type of algorithm, select: regular, rnd_policy
 parser.add_argument("--algorithm", type=str, default='rnd_policy')
+
+# explore coefficient
+parser.add_argument("--explore", type=float, default='2.0')
 
 args = parser.parse_args()
 
@@ -138,6 +144,7 @@ COEF_ADV_INIT = args.adv_coef_init
 COEF_ADV_SCHEDULE = args.adv_coef_sch
 COEF_DIFF_INIT = args.diff_coef_init
 COEF_DIFF_SCHEDULE = args.diff_coef_sch
+COEF_EXPLORATION = args.explore
 
 # callback hyperparameters
 CALLBACK_KEY = 'update'
@@ -270,7 +277,7 @@ if __name__=="__main__":
                           nminibatches=NBATCHES, noptepochs=NEPOCHS,
                           learning_rate=LR, verbose=1,
                           n_steps=NSTEPS, gamma=GAMMA, is_mlp=IS_MLP,
-                          env_name=env_name, opp_value=vic_value, retrain_victim=False)
+                          env_name=env_name, opp_value=vic_value, retrain_victim=False, explore_cof=COEF_EXPLORATION)
 
         Adv_train(venv, TRAINING_ITER, CHECKPOINT_INTERVAL, LOG_INTERVAL, CALLBACK_KEY, CALLBACK_MUL, logger, GAME_SEED,
                   use_victim_ob=USE_VIC)

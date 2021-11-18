@@ -878,7 +878,7 @@ class MyPPO_RND(ActorCriticRLModel):
                  noptepochs=4, cliprange=0.2, verbose=0, lr_schedule='const', tensorboard_log=None,
                  _init_setup_model=True, policy_kwargs=None, is_mlp=True, full_tensorboard_log=False,
                  model_saved_loc=None, env_name=None, opp_value=None, retrain_victim=False, norm_victim=False,
-                 use_baseline_policy=None, vic_agt_id=None):
+                 use_baseline_policy=None, vic_agt_id=None, explore_cof=None):
 
         """
         :param: policy: policy network and value function.
@@ -932,6 +932,7 @@ class MyPPO_RND(ActorCriticRLModel):
         self.noptepochs = noptepochs
         self.tensorboard_log = tensorboard_log
         self.full_tensorboard_log = full_tensorboard_log
+        self.explore_cof = explore_cof
 
         self.graph = None
         self.sess = None
@@ -1101,6 +1102,10 @@ class MyPPO_RND(ActorCriticRLModel):
                     rnd_network = RndValue(self.sess, self.observation_space, self.action_space, self.n_envs, 1,
                                                  n_batch_step)
 
+                    rnd_model = self.policy(self.sess, self.observation_space, self.action_space,
+                                            self.n_envs // self.nminibatches, self.n_steps,
+                                            n_batch_train)
+
                     # how to define this
                     # rnd_value = RndValue(self.sess, self.observation_space, self.action_space,
                     #                      self.n_envs // self.nminibatches, self.n_steps,
@@ -1166,8 +1171,8 @@ class MyPPO_RND(ActorCriticRLModel):
                         rnd_model.value_flat - self.old_intrinsic_vpred_ph, - self.clip_range_ph, self.clip_range_ph)
                     rnd_vf_losses1 = tf.square(rnd_vpred - self.intrinsic_rewards_ph)
                     rnd_vf_losses2 = tf.square(rnd_vpredclipped - self.intrinsic_rewards_ph)
-                    self.rnd_vf_loss = .5 * tf.reduce_mean(tf.maximum(rnd_vf_losses1, rnd_vf_losses2))
-                    # self.rnd_vf_loss = .5 * tf.reduce_mean(rnd_vf_losses1)
+                    # self.rnd_vf_loss = .5 * tf.reduce_mean(tf.maximum(rnd_vf_losses1, rnd_vf_losses2))
+                    self.rnd_vf_loss = .5 * tf.reduce_mean(rnd_vf_losses1)
                     self.vf_loss = .5 * tf.reduce_mean(tf.maximum(vf_losses1, vf_losses2))
 
                     # victim agent value function loss
@@ -1218,8 +1223,8 @@ class MyPPO_RND(ActorCriticRLModel):
                                                                       self.clip_range_ph), tf.float32))
                     # final ppo loss
                     loss = self.pg_loss - self.entropy * self.ent_coef + self.vf_loss * self.vf_coef
-                    # loss += 0.01 * (tf.norm(loss, 2)/tf.norm(self.rnd_vf_loss, 2)) * self.rnd_vf_loss
-                    loss += self.vf_coef * self.rnd_vf_loss
+                    loss += 0.1 * (tf.norm(loss, 2)/tf.norm(self.rnd_vf_loss, 2)) * self.rnd_vf_loss
+                    # loss += self.vf_coef * self.rnd_vf_loss
 
                     tf.summary.scalar('entropy_loss', self.entropy)
                     tf.summary.scalar('policy_gradient_loss', self.pg_loss)
@@ -1349,7 +1354,7 @@ class MyPPO_RND(ActorCriticRLModel):
 
                 self.summary = tf.summary.merge_all()
 
-    def _train_step(self, learning_rate, cliprange, coef_opp, coef_adv, coef_abs, obs, returns, masks, actions, values,
+    def _train_step(self, learning_rate, cliprange, coef_opp, coef_adv, coef_abs, explore_cof, obs, returns, masks, actions, values,
                     neglogpacs,
                     opp_obs, opp_returns, opp_values, abs_returns, abs_values,
                     intrinsic_returns, intrinsic_values, predict_values,
@@ -1379,7 +1384,7 @@ class MyPPO_RND(ActorCriticRLModel):
         intrinsic_advs = (intrinsic_advs - intrinsic_advs.mean()) / (intrinsic_advs.std() + 1e-8)
 
         advs = returns - values  # (n_envs*n_step//minibatch, )
-        advs = (advs - advs.mean()) / (advs.std() + 1e-8) + intrinsic_advs
+        advs = (advs - advs.mean()) / (advs.std() + 1e-8) + explore_cof * intrinsic_advs
 
         opp_advs = opp_returns - opp_values
         opp_advs = (opp_advs - opp_advs.mean()) / (opp_advs.std() + 1e-8)
@@ -1401,8 +1406,7 @@ class MyPPO_RND(ActorCriticRLModel):
                       self.abs_advs_ph: abs_advs,
                       self.abs_rewards_ph: abs_returns, self.old_abs_vpred_ph: abs_values,
                       self.coef_opp_ph: coef_opp, self.coef_adv_ph: coef_adv, self.coef_abs_ph: coef_abs,
-                      self.vtrain1_model.obs_ph: opp_obs, self.vtrain_model.obs_ph: opp_obs
-                      }
+                      self.vtrain1_model.obs_ph: opp_obs, self.vtrain_model.obs_ph: opp_obs}
 
             if states is not None:
                 masks_tmp = masks.reshape((self.n_envs // self.nminibatches, self.n_steps, 1))
@@ -1488,6 +1492,7 @@ class MyPPO_RND(ActorCriticRLModel):
         print('*********************************************')
 
         self.learning_rate = get_schedule_fn(self.learning_rate, schedule=self.lr_schedule)
+        self.explore_cof_ = get_schedule_fn(self.explore_cof, schedule=self.lr_schedule)
 
         self.coef_opp = get_schedule_fn(self.coef_opp_init, schedule=self.coef_opp_schedule)
         self.coef_adv = get_schedule_fn(self.coef_adv_init, schedule=self.coef_adv_schedule)
@@ -1520,6 +1525,7 @@ class MyPPO_RND(ActorCriticRLModel):
                     lr_now = self.learning_rate(0)
                 elif self.lr_schedule == 'linear':
                     lr_now = self.learning_rate(update, nupdates)
+                    explore_cof_now = self.explore_cof_(update, nupdates)
                 elif self.lr_schedule == 'step':
                     lr_now = self.learning_rate(update)
 
@@ -1570,7 +1576,7 @@ class MyPPO_RND(ActorCriticRLModel):
 
 
                             mb_loss_vals.append(
-                                self._train_step(lr_now, cliprangenow, coef_opp_now, coef_adv_now, coef_abs_now,
+                                self._train_step(lr_now, cliprangenow, coef_opp_now, coef_adv_now, coef_abs_now, explore_cof_now,
                                                  *slices, *slices_victim, *slice_intrinsic_return,
                                                  writer=writer, update=timestep))
 
