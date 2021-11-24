@@ -126,7 +126,7 @@ class ActorCriticPolicy(BasePolicy):
     def _setup_init(self):
         """Sets up the distributions, actions, and value."""
         with tf.variable_scope("output", reuse=True):
-            self._value_flat = self.value_fn[:, 0]
+            self._value_flat = self.value_fn[:,0]
             # self._rnd_flat = self.rnd_fn[:, 0]
 
     @property
@@ -265,6 +265,66 @@ class LstmPolicy(RecurrentActorCriticPolicy):
     def step(self, obs, state=None, mask=None, deterministic=False):
         pass
 
+class RNDActorCriticPolicy(BasePolicy):
+    """
+    Policy object that implements actor critic
+    :param sess: (TensorFlow session) The current TensorFlow session
+    :param ob_space: (Gym Space) The observation space of the environment
+    :param ac_space: (Gym Space) The action space of the environment
+    :param n_env: (int) The number of environments to run
+    :param n_steps: (int) The number of steps to run for each environment
+    :param n_batch: (int) The number of batch to run (n_envs * n_steps)
+    :param reuse: (bool) If the policy is reusable or not
+    :param scale: (bool) whether or not to scale the input
+    """
+
+    def __init__(self, sess, ob_space, ac_space, n_env, n_steps, n_batch, reuse=False, scale=False):
+        super(RNDActorCriticPolicy, self).__init__(sess, ob_space, ac_space, n_env, n_steps, n_batch, reuse=reuse,
+                                                scale=scale)
+        self._value_fn = None
+        self._rnd_fn = None
+        self._action = None
+
+    def _setup_init(self):
+        """Sets up the distributions, actions, and value."""
+        with tf.variable_scope("output", reuse=True):
+            self._value_flat = self.value_fn
+            # self._rnd_flat = self.rnd_fn[:, 0]
+
+    @property
+    def value_fn(self):
+        """tf.Tensor: value estimate, of shape (self.n_batch, 1)"""
+        return self._value_fn
+
+    @property
+    def value_flat(self):
+        """tf.Tensor: value estimate, of shape (self.n_batch, )"""
+        return self._value_flat
+
+    def rnd_fn(self):
+        """tf.Tensor: value estimate, of shape (self.n_batch, 1)"""
+        return self._rnd_fn
+
+    @property
+    def rnd_flat(self):
+        """tf.Tensor: value estimate, of shape (self.n_batch, )"""
+        return self._rnd_flat
+
+    @property
+    def action(self):
+        """tf.Tensor: stochastic action, of shape (self.n_batch, ) + self.ac_space.shape."""
+        return self._action
+
+    @abstractmethod
+    def value(self, obs, state=None, mask=None):
+        """
+        Returns the value for a single step
+        :param obs: ([float] or [int]) The current observation of the environment
+        :param state: ([float]) The last states (used in recurrent policies)
+        :param mask: ([float]) The last masks (used in recurrent policies)
+        :return: ([float]) The associated value of the action
+        """
+        raise NotImplementedError
 
 class FeedForwardPolicy(ActorCriticPolicy):
     """
@@ -348,7 +408,7 @@ class MlpValue(FeedForwardPolicy):
                                         feature_extraction="mlp", **_kwargs)
 
 
-class RNDFeedForward(ActorCriticPolicy):
+class RNDFeedForward(RNDActorCriticPolicy):
     """
     Policy object that implements actor critic, using a feed forward neural network.
     :param sess: (TensorFlow session) The current TensorFlow session
@@ -392,7 +452,7 @@ class RNDFeedForward(ActorCriticPolicy):
                 for i, layer_size in enumerate(layers):
                     rnd_latent = act_fun(linear(rnd_latent, 'rnd_fc' + str(i), n_hidden=layer_size,
                                                         init_scale=np.sqrt(2)))
-            self._value_fn = linear(rnd_latent, 'rnd_', 1)
+            self._value_fn = linear(rnd_latent, 'rnd_', 128)
 
         self._setup_init()
 

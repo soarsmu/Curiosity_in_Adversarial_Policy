@@ -21,7 +21,7 @@ from value import MlpValue, MlpLstmValue
 ##################
 parser = argparse.ArgumentParser()
 # game env
-parser.add_argument("--env", type=int, default=1)
+parser.add_argument("--env", type=int, default=4)
 # random seed
 parser.add_argument("--seed", type=int, default=0)
 # number of game environment. should be divisible by NBATCHES if using a LSTM policy
@@ -44,9 +44,9 @@ parser.add_argument("--vic_agt_id", type=int, default=1)
 # victim agent id: 3
 
 # victim agent network
-parser.add_argument("--vic_net", type=str, default='MLP')
+parser.add_argument("--vic_net", type=str, default='LSTM')
 # adv agent network
-parser.add_argument("--adv_net", type=str, default='MLP')
+parser.add_argument("--adv_net", type=str, default='LSTM')
 
 # learning rate scheduler
 parser.add_argument("--lr_sch", type=str, default='linear')
@@ -75,7 +75,7 @@ parser.add_argument("--render", type=int, default=0)
 parser.add_argument("--algorithm", type=str, default='rnd_policy')
 
 # explore coefficient
-parser.add_argument("--explore", type=float, default='2.0')
+parser.add_argument("--explore", type=float, default='1')
 
 args = parser.parse_args()
 

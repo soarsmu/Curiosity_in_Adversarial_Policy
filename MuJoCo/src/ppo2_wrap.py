@@ -1144,7 +1144,7 @@ class MyPPO_RND(ActorCriticRLModel):
                     self.intrinsic_advs_ph = tf.placeholder(tf.float32, [None], name="intrinsic_advs_ph")
                     self.intrinsic_rewards_ph = tf.placeholder(tf.float32, [None], name="intrinsic_rewards_ph")
                     self.old_intrinsic_vpred_ph = tf.placeholder(tf.float32, [None], name="old_intrinsic_vpred_ph")
-                    self.predict_features = tf.placeholder(tf.float32, [None], name="predict_features")
+                    self.predict_features = tf.placeholder(tf.float32, [None, None], name="predict_features")
 
 
                     neglogpac = train_model.proba_distribution.neglogp(self.action_ph)  # (n_step*n_envs//minibatch)
@@ -1525,7 +1525,8 @@ class MyPPO_RND(ActorCriticRLModel):
                     lr_now = self.learning_rate(0)
                 elif self.lr_schedule == 'linear':
                     lr_now = self.learning_rate(update, nupdates)
-                    explore_cof_now = self.explore_cof_(update, nupdates)
+                    # explore_cof_now = self.explore_cof_(update, nupdates)
+                    explore_cof_now = self.explore_cof
                 elif self.lr_schedule == 'step':
                     lr_now = self.learning_rate(update)
 
@@ -1897,7 +1898,7 @@ class Runner(AbstractEnvRunner):
 
         mb_target_features = np.asarray(mb_target_features, dtype=np.float32)
         mb_predicted_features = np.asarray(mb_predicted_features, dtype=np.float32)
-        mb_intrinsic_reward = 0.5 * (mb_predicted_features - mb_target_features) ** 2
+        mb_intrinsic_reward = np.mean(0.5 * (mb_predicted_features - mb_target_features) ** 2, axis=-1)
         mb_intrinsic_value = np.asarray(mb_intrinsic_value, dtype=np.float32)
 
         if not self.is_mlp:
