@@ -40,10 +40,11 @@ def plot_graph(cluster_ids_path, output_dir):
     # plot the graph
     fig, ax = plt.subplots(figsize=(3.2, 3.2))
 
-    colors = {"Our": "orangered", "Zoo": '#2ca02c', "Ucb": "blue"}
-    len = int(data.shape[0] / 3)
+    colors = {"Our": "orangered", "Zoo": "green", "Ucb": "blue", "Rnd": 'yellow'} #
+    len = int(data.shape[0] / 4)
 
-    opponent_type = ['Zoo'] * len + ['Our'] * len + ['Ucb'] * len
+    opponent_type =  ['Zoo'] * len + ['Our'] * len + ['Ucb'] * len + ['Rnd'] * len
+    #
 
     metadata_df = pd.DataFrame(
         {
@@ -57,14 +58,14 @@ def plot_graph(cluster_ids_path, output_dir):
     ax.xaxis.set_major_locator(matplotlib.ticker.NullLocator())
     ax.yaxis.set_major_locator(matplotlib.ticker.NullLocator())
     ax.margins(x=0.01, y=0.01)
-    ax.scatter(data[:, 0], data[:, 1], c=hues, alpha=0.75, s=0.25, edgecolors="none", linewidth=1)
+    ax.scatter(data[:, 0], data[:, 1], c=hues, alpha=0.75, s=0.4, edgecolors="none", linewidth=1)
     fig.savefig(output_dir + '/' + output_dir.split('/')[-1] + '.pdf')
 
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--dir", type=str, default='../activations/tsne/YouShallNotPassHumans')
-    parser.add_argument("--output_dir", type=str, default='../activations/tsne/YouShallNotPassHumans')
+    parser.add_argument("--dir", type=str, default='../activations/tsne/SumoHumans')
+    parser.add_argument("--output_dir", type=str, default='../activations/tsne/SumoHumans')
 
     args = parser.parse_args()
 
@@ -72,6 +73,8 @@ if __name__ == '__main__':
     activation_paths['norm'] = args.dir + '/activations_norm.npy'
     activation_paths['our'] = args.dir + '/activations_our_adv.npy'
     activation_paths['ucb'] = args.dir + '/activations_ucb_adv.npy'
+    activation_paths['rnd'] = args.dir + '/activations_rnd_adv.npy'
+
 
     fit_tsne(activation_paths, args.output_dir)
     cluster_ids_path = args.dir + '/cluster_ids.npy'

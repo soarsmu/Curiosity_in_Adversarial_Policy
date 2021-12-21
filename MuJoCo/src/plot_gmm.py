@@ -7,9 +7,9 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 
-TRAIN_ID = 'ucb'
+TRAIN_ID = 'norm'
 
-ENV_NAMES = ["KickAndDefend", "SumoHumans", "SumoAnts", "YouShallNotPassHumans"]
+ENV_NAMES = ["KickAndDefend", "YouShallNotPassHumans", "SumoHumans", "SumoAnts", "RunToGoalAnts" ]#
 
 PRETTY_ENVS = collections.OrderedDict(
     [
@@ -17,27 +17,29 @@ PRETTY_ENVS = collections.OrderedDict(
         ("YouShallNotPassHumans", "You Shall\nNot Pass"),
         ("SumoHumans", "Sumo\nHumans"),
         ("SumoAnts", "Sumo\nAnts"),
+        ("RunToGoalAnts", "Run To\nGoal Ants"),
     ]
 )
 
 PRETTY_OPPONENTS = collections.OrderedDict(
     [
-        ("ucb", "UcbT"),
-        ("ucb_test", "UcbV"),
-        ("our", "Our"),
-        ("norm", "Zoo"),
-        # ("norm", "ZooT"),
-        # ("norm_test", "ZooV"),
+        # ("ucb", "UcbT"),
+        # ("ucb_test", "UcbV"),
         # ("our", "Our"),
-        # ("ucb", "Ucb"),
+        # ("norm", "Zoo"),
+        ("norm", "ZooT"),
+        ("norm_test", "ZooV"),
+        ("our", "Our"),
+        ("ucb", "Ucb"),
+        ("rnd", "RND"),
     ]
 )
 
-CYCLE_ORDER = ["Our", "Zoo", "UcbT", "UcbV"]
-BAR_ORDER = ["UcbT", "UcbV", "Our", "Zoo"]
+# CYCLE_ORDER = ["Our", "Zoo", "UcbT", "UcbV"]
+# BAR_ORDER = ["UcbT", "UcbV", "Our", "Zoo"]
 #
-# CYCLE_ORDER = ["Our", "Ucb", "ZooT", "ZooV"]
-# BAR_ORDER = ["ZooT", "ZooV", "Our", "Ucb"]
+CYCLE_ORDER = ["Our", "Ucb", "ZooT", "ZooV", "RND"]
+BAR_ORDER = ["ZooT", "ZooV", "Our", "Ucb", "RND"]
 
 STYLES = {
     "paper": {
@@ -141,7 +143,7 @@ def density_fitter(activation_paths, output_dir, train_opponent, n_components, t
 
 def load_metadata(env):
 
-    metadata_path = '../activations/gmm/' + env + '/metadata_ucb.csv'
+    metadata_path = '../activations/gmm/' + env + '/metadata_norm.csv'
     df = pd.read_csv(metadata_path)
 
     # We want to evaluate on both the train and test set for the train opponent.
@@ -185,15 +187,17 @@ def bar_chart(envs, savefile=None):
 
     # Make colors consistent with previous figures
     palette = {}
-    # palette['Our'] = 'red'
-    # palette['Ucb'] = '#0165FC'
-    # palette['ZooT'] = '#2ca02c'
-    # palette['ZooV'] = '#ff7f0e'
+    palette['Our'] = '#0165FC'
+    palette['Ucb'] = '#ff7f0e'
+    palette['ZooT'] = '#2ca02c'
+    palette['ZooV'] = 'gray'
+    palette['RND'] = 'yellow'
 
-    palette['Our'] = 'red'
-    palette['UcbT'] = '#0165FC'
-    palette['Zoo'] = '#2ca02c'
-    palette['UcbV'] = '#ff7f0e'
+
+    # palette['Our'] = 'red'
+    # palette['UcbT'] = '#0165FC'
+    # palette['Zoo'] = '#2ca02c'
+    # palette['UcbV'] = '#ff7f0e'
 
     # Actually plot
     sns.barplot(
@@ -224,22 +228,23 @@ def bar_chart(envs, savefile=None):
 
 if __name__ == '__main__':
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--dir", type=str, default='../activations/gmm/SumoHumans')
-    parser.add_argument("--output_dir", type=str, default='../activations/gmm/SumoHumans')
+    # parser = argparse.ArgumentParser()
+    # parser.add_argument("--dir", type=str, default='../activations/gmm/SumoHumans')
+    # parser.add_argument("--output_dir", type=str, default='../activations/gmm/SumoHumans')
+    #
+    # args = parser.parse_args()
+    #
+    # activation_paths = {}
+    #
+    # activation_paths['norm'] = args.dir + '/activations_norm.npy'
+    # activation_paths['our'] = args.dir + '/activations_our_adv.npy'
+    # activation_paths['ucb'] = args.dir + '/activations_ucb_adv.npy'
+    # activation_paths['rnd'] = args.dir + '/activations_rnd_adv.npy'
 
-    args = parser.parse_args()
-
-    activation_paths = {}
-
-    activation_paths['norm'] = args.dir + '/activations_norm.npy'
-    activation_paths['our'] = args.dir + '/activations_our_adv.npy'
-    activation_paths['ucb'] = args.dir + '/activations_ucb_adv.npy'
-
-    density_fitter(activation_paths, args.output_dir, 'ucb', n_components=25, type='full')
+    # density_fitter(activation_paths, args.output_dir, 'norm', n_components=5, type='full')
 
     styles = ["paper", "density_twocol"]
     sns.set_style("whitegrid")
     for style in styles:
         plt.style.use(STYLES[style])
-    bar_chart(ENV_NAMES, savefile='../activations/gmm/chart.png')
+    bar_chart(ENV_NAMES, savefile='../activations/gmm/chart.pdf')

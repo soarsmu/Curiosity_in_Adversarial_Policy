@@ -10,8 +10,10 @@ from scheduling import ConstantAnnealer, Scheduler
 from shaping_wrappers import apply_reward_wrapper
 from environment import Monitor, Multi_Monitor, make_mixadv_multi2single_env
 from logger import setup_logger
-from ppo2_wrap import MyPPO2
-from value import MlpValue, MlpLstmValue
+from ppo2_ori import MyPPO2
+from ppo2_wrap import MyPPO_RND
+from value import MlpLstmValue
+from value_ori import  MlpValue
 from stable_baselines.common.policies import MlpPolicy, MlpLstmPolicy
 
 # from common import get_zoo_path
@@ -22,21 +24,33 @@ os.environ['CUDA_VISIBLE_DEVICES'] = ' '
 ##################
 parser = argparse.ArgumentParser()
 # game env
-parser.add_argument("--env", type=int, default=2)
+parser.add_argument("--env", type=int, default=0)
 # random seed
 parser.add_argument("--seed", type=int, default=0)
 # number of game environment. should be divisible by NBATCHES if using a LSTM policy
-parser.add_argument("--n_games", type=int, default=1) # N_GAME = 8
+parser.add_argument("--n_games", type=int, default=8) # N_GAME = 8
 # which victim agent to use
 parser.add_argument("--vic_agt_id", type=int, default=1)
 
+# kickAndDefend
+# /home/gc/attack_rl/rl_adv_valuediff/MuJoCo/adv-baseline/KickAndDefend/our_method/20211122_014022-0/checkpoints/000019906560
+# YouShallNotPass
+# /home/gc/attack_rl/rl_adv_valuediff/MuJoCo/adv-baseline/YouShallNotPass/our_method/20211203_130414-1/checkpoints/000019906560
+# /home/gc/attack_rl/rl_adv_valuediff/MuJoCo/adv-baseline/YouShallNotPass/our_method/20211123_231545-2/checkpoints/000019906560
+# SumoAnts
+# /home/gc/attack_rl/rl_adv_valuediff/MuJoCo/adv-baseline/SumoAnts/our_method/20211119_204919-3/checkpoints/000019906560
+# SumoHumans
+# /home/gc/attack_rl/rl_adv_valuediff/MuJoCo/adv-baseline/SumoHumans/our_method/20211202_120529-0/checkpoints/000019906560
+# /home/gc/attack_rl/rl_adv_valuediff/MuJoCo/adv-baseline/SumoHumans/our_method/20211202_022122-1/checkpoints/000019906560
+# RunToGoalAnts
+# /home/gc/attack_rl/rl_adv_valuediff/MuJoCo/adv-baseline/RunToGoalAnts/our_method/20211118_151712-3/checkpoints/000019906560
 # adversarial agent path
-parser.add_argument("--adv_path", type=str, default='/Users/Henryguo/Desktop/rl_newloss/MuJoCo/adv_agent-zoo/ucb/you/model.npy')
+parser.add_argument("--adv_path", type=str, default='/home/gc/attack_rl/rl_adv_valuediff/MuJoCo/adv-baseline/SumoHumans/our_method/20211202_022122-1/checkpoints/000019906560/model.pkl')
 parser.add_argument("--adv_ismlp", type=bool, default=True)
 # adversarial agent's observation norm mean / variance path
-parser.add_argument("--adv_obs_normpath", type=str, default='/Users/Henryguo/Desktop/rl_newloss/MuJoCo/adv_agent-zoo/ucb/you/obs_rms.pkl')
+parser.add_argument("--adv_obs_normpath", type=str, default='/home/gc/attack_rl/rl_adv_valuediff/MuJoCo/adv-baseline/SumoHumans/our_method/20211202_022122-1/checkpoints/000019906560/obs_rms.pkl')
 # victim agent network
-parser.add_argument("--vic_net", type=str, default='MLP')
+parser.add_argument("--vic_net", type=str, default='LSTM')
 
 # learning rate scheduler
 parser.add_argument("--lr_sch", type=str, default='const')
@@ -44,7 +58,7 @@ parser.add_argument("--lr_sch", type=str, default='const')
 parser.add_argument("--nsteps", type=int, default=2048)
 
 # victim loss coefficient.
-parser.add_argument("--vic_coef_init", type=int, default=0) # positive
+parser.add_argument("--vic_coef_init", type=int, default=1) # positive
 # victim loss schedule
 parser.add_argument("--vic_coef_sch", type=str, default='const')
 # adv loss coefficient.
@@ -68,6 +82,8 @@ parser.add_argument("--mix_ratio", type=float, default=0.8)
 parser.add_argument("--load", type=int, default=0)
 # visualize the video
 parser.add_argument("--render", type=int, default=0)
+parser.add_argument("--explore", type=float, default='3')
+
 args = parser.parse_args()
 
 # Adversarial agent path.
@@ -84,6 +100,8 @@ GAME_SEED = args.seed
 N_GAME = args.n_games
 # which victim agent to use
 VIC_AGT_ID = args.vic_agt_id
+COEF_EXPLORATION = args.explore
+
 
 # reward hyperparameters
 # reward shaping parameters

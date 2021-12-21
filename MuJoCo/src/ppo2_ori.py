@@ -19,7 +19,8 @@ from stable_baselines.common.policies import MlpLstmPolicy
 from agent import get_zoo_path
 from zoo_utils import load_from_file, setFromFlat, LSTMPolicy, MlpPolicyValue
 from stable_baselines.a2c.utils import total_episode_reward_logger
-from value import MlpLstmValue, MlpValue
+from value import MlpValue
+from value_ori import MlpLstmValue
 import pdb
 
 

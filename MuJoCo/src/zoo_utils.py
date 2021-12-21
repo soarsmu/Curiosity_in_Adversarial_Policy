@@ -26,6 +26,8 @@ def load_from_model(param_pkl_path):
     if param_pkl_path.endswith('.pkl'):
        with open(param_pkl_path, 'rb') as f:
             params = pickle.load(f)
+       # if params.ndim == 1:
+       #     params.reshape(params.size, 1)
        policy_param = params[1][0]
        flat_param = []
        for param in policy_param:

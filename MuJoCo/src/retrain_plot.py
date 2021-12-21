@@ -218,18 +218,18 @@ def plot_data(log_dir, out_dir, filename, game, length=350, reverse=False):
 # main function
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--num_seed", type=int, default=6)
-    parser.add_argument('--log_dir', type=str, default='/Users/Henryguo/Desktop/rl_newloss/MuJoCo/results/retrain_50/ucb')
-    parser.add_argument("--out_dir", type=str, default='/Users/Henryguo/Desktop/rl_newloss/MuJoCo/results/retrain_50/ucb')
+    parser.add_argument("--num_seed", type=int, default=5)
+    parser.add_argument('--log_dir', type=str, default='/home/gc/attack_rl/rl_adv_valuediff/MuJoCo/retrained-ICML')
+    parser.add_argument("--out_dir", type=str, default='/home/gc/attack_rl/rl_adv_valuediff/MuJoCo/retrained-ICML')
     parser.add_argument("--filename", type=str, default='out.png')
     args = parser.parse_args()
     out_dir = args.out_dir
     log_dir = args.log_dir
 
-    game = 'YouShallNotPass'
+    # game = 'YouShallNotPass'
     # game = 'KickAndDefend'
     # game = 'SumoHumans'
-    # game = 'SumoAnts'
+    game = 'SumoAnts'
     log_dir = log_dir + '/' + game
 
     for reverse in [False, True]:

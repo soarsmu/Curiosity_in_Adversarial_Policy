@@ -15,7 +15,7 @@ def run(config):
         policy_type="mlp"
         vic_id = 1
     else:
-        policy_type="lstm"
+        policy_type="mlp"
         vic_id = 0
     env = gym.make(ENV_NAME)
     out_dir = config.out_dir + ENV_NAME.split('/')[1][:-3]
@@ -150,31 +150,43 @@ if __name__ == "__main__":
     p.add_argument("--env", default=5, type=int)
 
     # YouShallNotPass
-    # p.add_argument("--opp-path", default="../adv-agent/our_attack/you/model.pkl", type=str)
-    # #p.add_argument("--opp_path", default="../multiagent-competition/agent-zoo/you-shall-not-pass/agent1_parameters-v1.pkl", type=str)
+    # p.add_argument("--opp-path", default="../adv-agent/rnd_attack/you/model.pkl", type=str)
+    # # p.add_argument("--opp_path", default="../multiagent-competition/agent-zoo/you-shall-not-pass/agent1_parameters-v1.pkl", type=str)
     # p.add_argument("--vic_path", default="../multiagent-competition/agent-zoo/you-shall-not-pass/agent2_parameters-v1.pkl", type=str)
-    # p.add_argument("--norm_path", default="../adv-agent/our_attack/you/obs_rms.pkl", type=str)
+    # p.add_argument("--norm_path", default="../adv-agent/rnd_attack/you/obs_rms.pkl", type=str)
 
     # KickAndDefend
-    # p.add_argument("--opp-path", default="../adv-agent/our_attack/kick/model.pkl", type=str)
-    # #p.add_argument("--opp_path", default="../multiagent-competition/agent-zoo/kick-and-defend/defender/agent2_parameters-v1.pkl", type=str)
+    #p.add_argument("--opp-path", default="../adv-agent/our_attack/kick/model.pkl", type=str)
+    # p.add_argument("--opp_path", default="../adv-agent/ucb/kick/model.npy", type=str)
     # p.add_argument("--vic_path", default="../multiagent-competition/agent-zoo/kick-and-defend/kicker/agent1_parameters-v1.pkl", type=str)
-    # p.add_argument("--norm_path", default="../adv-agent/our_attack/kick/obs_rms.pkl", type=str)
-
+    # p.add_argument("--norm_path", default="../adv-agent/ucb/kick/obs_rms.pkl", type=str)
+    # #
     # SumoHumans
-    p.add_argument("--opp-path", default="../adv-agent/our_attack/humans/model.pkl", type=str)
-    #p.add_argument("--opp_path", default="../multiagent-competition/agent-zoo/sumo/humans/agent_parameters-v3.pkl", type=str)
-    p.add_argument("--vic_path", default="../multiagent-competition/agent-zoo/sumo/humans/agent_parameters-v3.pkl", type=str)
-    p.add_argument("--norm_path", default="../adv-agent/our_attack/humans/obs_rms.pkl", type=str)
+    # p.add_argument("--opp-path", default="../adv-agent/rnd_attack/suhuman/model.pkl", type=str)
+    p.add_argument("--opp_path", default="../adv-agent/rnd_attack/suhuman/model.pkl", type=str)
+    p.add_argument("--vic_path", default="../multiagent-competition/agent-zoo/sumo/humans/agent_parameters-v2.pkl", type=str)
+    p.add_argument("--norm_path", default="../adv-agent/rnd_attack/suhuman/obs_rms.pkl", type=str)
 
-    # SumoAnts
-    # p.add_argument("--opp-path", default="../adv-agent/our_attack/ants/model.pkl", type=str)
-    # #p.add_argument("--opp_path", default="../multiagent-competition/agent-zoo/sumo/ants/agent_parameters-v1.pkl", type=str)
-    # p.add_argument("--vic_path", default="../multiagent-competition/agent-zoo/sumo/ants/agent_parameters-v1.pkl", type=str)
-    # p.add_argument("--norm_path", default="../adv-agent/our_attack/ants/obs_rms.pkl", type=str)
+    #SumoAnts
+    # #p.add_argument("--opp-path", default="/home/gc/attack_rl/rl_adv_valuediff/MuJoCo/multiagent-competition/agent-zoo/sumo/ants/agent_parameters-v4.pkl", type=str)
+    # p.add_argument("--opp_path", default="../adv-agent/rnd_attack/suant/model.pkl", type=str)
+    # p.add_argument("--vic_path", default="/home/gc/attack_rl/rl_adv_valuediff/MuJoCo/multiagent-competition/agent-zoo/sumo/ants/agent_parameters-v1.pkl", type=str)
+    # p.add_argument("--norm_path", default="../adv-agent/rnd_attack/suant/obs_rms.pkl", type=str)
 
-    # either 'norm', 'ucb_adv', 'our_adv'
-    p.add_argument('--opp_type', default='our_adv', type=str)
+    # RuntoGoalAnts
+    # # p.add_argument("--opp-path", default="../multiagent-competition/agent-zoo/run-to-goal/ants/agent2_parameters-v1.pkl", type=str)
+    # p.add_argument("--opp_path", default="../adv-agent/rnd_attack/runant/model.pkl", type=str)
+    # p.add_argument("--vic_path", default="../multiagent-competition/agent-zoo/run-to-goal/ants/agent1_parameters-v1.pkl", type=str)
+    # p.add_argument("--norm_path", default="../adv-agent/rnd_attack/runant/obs_rms.pkl", type=str)
+
+    # RuntoGoalHumans
+    # # p.add_argument("--opp-path", default="../multiagent-competition/agent-zoo/run-to-goal/humans/agent2_parameters-v1.pkl", type=str)
+    # p.add_argument("--opp_path", default="../adv-agent/rnd_attack/runhuman/model.pkl", type=str)
+    # p.add_argument("--vic_path", default="../multiagent-competition/agent-zoo/run-to-goal/humans/agent1_parameters-v1.pkl", type=str)
+    # p.add_argument("--norm_path", default="../adv-agent/rnd_attack/runhuman/obs_rms.pkl", type=str)
+
+    # either 'norm', 'ucb_adv', 'our_adv' 'rnd_adv'
+    p.add_argument('--opp_type', default='rnd_adv', type=str)
     p.add_argument("--max_steps", default=5000, help="max number of steps", type=int)
     p.add_argument("--epsilon", default=1e-8, type=float)
     p.add_argument("--clip_obs", default=10, type=float)
