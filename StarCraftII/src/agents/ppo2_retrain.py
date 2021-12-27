@@ -57,7 +57,7 @@ class Adv_Model(object):
                            reuse=False)
         vtrain_model = value(sess, "oppo_value", ob_space, ac_space, nbatch_train,
                              unroll_length, reuse=True)
-
+        # ignore
         vact1_model = value(sess, "diff_value", ob_space, ac_space, nbatch_act, 1,
                             reuse=False)
         vtrain1_model = value(sess, "diff_value", ob_space, ac_space, nbatch_train,

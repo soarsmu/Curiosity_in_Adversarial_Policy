@@ -121,13 +121,15 @@ class ActorCriticPolicy(BasePolicy):
                                                 scale=scale)
         self._value_fn = None
         self._rnd_fn = None
+        self._rnd_base_fn = None
         self._action = None
 
     def _setup_init(self):
         """Sets up the distributions, actions, and value."""
+        self._rnd_base_flat = self.rnd_base_fn
         with tf.variable_scope("output", reuse=True):
             self._value_flat = self.value_fn[:,0]
-            # self._rnd_flat = self.rnd_fn[:, 0]
+            self._rnd_flat = self.rnd_fn
 
     @property
     def value_fn(self):
@@ -139,6 +141,7 @@ class ActorCriticPolicy(BasePolicy):
         """tf.Tensor: value estimate, of shape (self.n_batch, )"""
         return self._value_flat
 
+    @property
     def rnd_fn(self):
         """tf.Tensor: value estimate, of shape (self.n_batch, 1)"""
         return self._rnd_fn
@@ -149,12 +152,32 @@ class ActorCriticPolicy(BasePolicy):
         return self._rnd_flat
 
     @property
+    def rnd_base_fn(self):
+        """tf.Tensor: value estimate, of shape (self.n_batch, 1)"""
+        return self._rnd_base_fn
+
+    @property
+    def rnd_base_flat(self):
+        """tf.Tensor: value estimate, of shape (self.n_batch, )"""
+        return self._rnd_base_flat
+
+    @property
     def action(self):
         """tf.Tensor: stochastic action, of shape (self.n_batch, ) + self.ac_space.shape."""
         return self._action
 
     @abstractmethod
     def value(self, obs, state=None, mask=None):
+        """
+        Returns the value for a single step
+        :param obs: ([float] or [int]) The current observation of the environment
+        :param state: ([float]) The last states (used in recurrent policies)
+        :param mask: ([float]) The last masks (used in recurrent policies)
+        :return: ([float]) The associated value of the action
+        """
+        raise NotImplementedError
+
+    def rnd_value(self, obs, state=None, mask=None):
         """
         Returns the value for a single step
         :param obs: ([float] or [int]) The current observation of the environment
@@ -265,6 +288,96 @@ class LstmPolicy(RecurrentActorCriticPolicy):
     def step(self, obs, state=None, mask=None, deterministic=False):
         pass
 
+class FeedForwardPolicy(ActorCriticPolicy):
+    """
+    Policy object that implements actor critic, using a feed forward neural network.
+    :param sess: (TensorFlow session) The current TensorFlow session
+    :param ob_space: (Gym Space) The observation space of the environment
+    :param ac_space: (Gym Space) The action space of the environment
+    :param n_env: (int) The number of environments to run
+    :param n_steps: (int) The number of steps to run for each environment
+    :param n_batch: (int) The number of batch to run (n_envs * n_steps)
+    :param reuse: (bool) If the policy is reusable or not
+    :param layers: ([int]) (deprecated, use net_arch instead) The size of the Neural network for the policy
+        (if None, default to [64, 64])
+    :param net_arch: (list) Specification of the actor-critic policy network architecture (see mlp_extractor
+        documentation for details).
+    :param act_fun: (tf.func) the activation function to use in the neural network.
+    :param cnn_extractor: (function (TensorFlow Tensor, ``**kwargs``): (TensorFlow Tensor)) the CNN feature extraction
+    :param feature_extraction: (str) The feature extraction type ("cnn" or "mlp")
+    :param kwargs: (dict) Extra keyword arguments for the nature CNN feature extraction
+    """
+
+    def __init__(self, sess, ob_space, ac_space, n_env, n_steps, n_batch, reuse=False, layers=None, net_arch=None,
+                 act_fun=tf.tanh, cnn_extractor=nature_cnn, feature_extraction="cnn", **kwargs):
+        super(FeedForwardPolicy, self).__init__(sess, ob_space, ac_space, n_env, n_steps, n_batch, reuse=reuse,
+                                                scale=(feature_extraction == "cnn"))
+
+        self._kwargs_check(feature_extraction, kwargs)
+        self.vf_latent = None
+
+        if layers is not None:
+            warnings.warn("Usage of the `layers` parameter is deprecated! Use net_arch instead "
+                          "(it has a different semantics though).", DeprecationWarning)
+            if net_arch is not None:
+                warnings.warn("The new `net_arch` parameter overrides the deprecated `layers` parameter!",
+                              DeprecationWarning)
+        if net_arch is None:
+            if layers is None:
+                layers = [128, 128]
+        with tf.variable_scope("model", reuse=reuse):
+            if feature_extraction == "cnn":
+                vf_latent = cnn_extractor(self.processed_obs, **kwargs)
+            else:
+                vf_latent = tf.layers.flatten(self.processed_obs)
+                hidden_features = []
+                for i, layer_size in enumerate(layers):
+                    hidden_features.append(vf_latent)
+                    vf_latent = act_fun(linear(vf_latent, 'pi_fc' + str(i), n_hidden=layer_size,
+                                                        init_scale=np.sqrt(2)))
+
+            self._value_fn = linear(vf_latent, 'vf', 1)
+            self._rnd_fn = linear(hidden_features[1], 'rnd', 128)
+            self._rnd_base_fn = linear(hidden_features[1], 'rnd_base', 128)
+
+        self._setup_init()
+
+    def value(self, obs, state=None, mask=None):
+        v = self.sess.run(self.value_flat, {self.obs_ph: obs})
+        return v, state
+
+    def rnd_value(self, obs, state=None, mask=None):
+        v = self.sess.run(self.rnd_flat, {self.obs_ph: obs})
+        return v, state
+
+    def rnd_base_value(self, obs, state=None, mask=None):
+        v = self.sess.run(self.rnd_base_flat, {self.obs_ph: obs})
+        return v, state
+
+    def proba_step(self, obs, state=None, mask=None):
+        pass
+
+    def step(self, obs, state=None, mask=None, deterministic=False):
+        pass
+
+
+class MlpValue(FeedForwardPolicy):
+    """
+    Policy object that implements actor critic, using a MLP (2 layers of 64)
+    :param sess: (TensorFlow session) The current TensorFlow session
+    :param ob_space: (Gym Space) The observation space of the environment
+    :param ac_space: (Gym Space) The action space of the environment
+    :param n_env: (int) The number of environments to run
+    :param n_steps: (int) The number of steps to run for each environment
+    :param n_batch: (int) The number of batch to run (n_envs * n_steps)
+    :param reuse: (bool) If the policy is reusable or not
+    :param _kwargs: (dict) Extra keyword arguments for the nature CNN feature extraction
+    """
+
+    def __init__(self, sess, ob_space, ac_space, n_env, n_steps, n_batch, reuse=False, **_kwargs):
+        super(MlpValue, self).__init__(sess, ob_space, ac_space, n_env, n_steps, n_batch, reuse,
+                                        feature_extraction="mlp", **_kwargs)
+
 class RNDActorCriticPolicy(BasePolicy):
     """
     Policy object that implements actor critic
@@ -289,7 +402,7 @@ class RNDActorCriticPolicy(BasePolicy):
         """Sets up the distributions, actions, and value."""
         with tf.variable_scope("output", reuse=True):
             self._value_flat = self.value_fn
-            # self._rnd_flat = self.rnd_fn[:, 0]
+            self._rnd_flat = self.rnd_fn
 
     @property
     def value_fn(self):
@@ -326,87 +439,15 @@ class RNDActorCriticPolicy(BasePolicy):
         """
         raise NotImplementedError
 
-class FeedForwardPolicy(ActorCriticPolicy):
-    """
-    Policy object that implements actor critic, using a feed forward neural network.
-    :param sess: (TensorFlow session) The current TensorFlow session
-    :param ob_space: (Gym Space) The observation space of the environment
-    :param ac_space: (Gym Space) The action space of the environment
-    :param n_env: (int) The number of environments to run
-    :param n_steps: (int) The number of steps to run for each environment
-    :param n_batch: (int) The number of batch to run (n_envs * n_steps)
-    :param reuse: (bool) If the policy is reusable or not
-    :param layers: ([int]) (deprecated, use net_arch instead) The size of the Neural network for the policy
-        (if None, default to [64, 64])
-    :param net_arch: (list) Specification of the actor-critic policy network architecture (see mlp_extractor
-        documentation for details).
-    :param act_fun: (tf.func) the activation function to use in the neural network.
-    :param cnn_extractor: (function (TensorFlow Tensor, ``**kwargs``): (TensorFlow Tensor)) the CNN feature extraction
-    :param feature_extraction: (str) The feature extraction type ("cnn" or "mlp")
-    :param kwargs: (dict) Extra keyword arguments for the nature CNN feature extraction
-    """
-
-    def __init__(self, sess, ob_space, ac_space, n_env, n_steps, n_batch, reuse=False, layers=None, net_arch=None,
-                 act_fun=tf.tanh, cnn_extractor=nature_cnn, feature_extraction="cnn", **kwargs):
-        super(FeedForwardPolicy, self).__init__(sess, ob_space, ac_space, n_env, n_steps, n_batch, reuse=reuse,
-                                                scale=(feature_extraction == "cnn"))
-
-        self._kwargs_check(feature_extraction, kwargs)
-
-        if layers is not None:
-            warnings.warn("Usage of the `layers` parameter is deprecated! Use net_arch instead "
-                          "(it has a different semantics though).", DeprecationWarning)
-            if net_arch is not None:
-                warnings.warn("The new `net_arch` parameter overrides the deprecated `layers` parameter!",
-                              DeprecationWarning)
-        if net_arch is None:
-            if layers is None:
-                layers = [128, 128]
-        with tf.variable_scope("model", reuse=reuse):
-            if feature_extraction == "cnn":
-                vf_latent = cnn_extractor(self.processed_obs, **kwargs)
-            else:
-                vf_latent = tf.layers.flatten(self.processed_obs)
-                for i, layer_size in enumerate(layers):
-                    vf_latent = act_fun(linear(vf_latent, 'pi_fc' + str(i), n_hidden=layer_size,
-                                                        init_scale=np.sqrt(2)))
-            self._value_fn = linear(vf_latent, 'vf', 1)
-            # self._rnd_fn = linear(vf_latent, 'rnd', 1)
-
-        self._setup_init()
-
-    def value(self, obs, state=None, mask=None):
-        v = self.sess.run(self.value_flat, {self.obs_ph: obs})
-        return v, state
-
     def rnd_value(self, obs, state=None, mask=None):
-        v = self.sess.run(self.value_flat, {self.obs_ph: obs})
-        return v, state
-
-    def proba_step(self, obs, state=None, mask=None):
-        pass
-
-    def step(self, obs, state=None, mask=None, deterministic=False):
-        pass
-
-
-class MlpValue(FeedForwardPolicy):
-    """
-    Policy object that implements actor critic, using a MLP (2 layers of 64)
-    :param sess: (TensorFlow session) The current TensorFlow session
-    :param ob_space: (Gym Space) The observation space of the environment
-    :param ac_space: (Gym Space) The action space of the environment
-    :param n_env: (int) The number of environments to run
-    :param n_steps: (int) The number of steps to run for each environment
-    :param n_batch: (int) The number of batch to run (n_envs * n_steps)
-    :param reuse: (bool) If the policy is reusable or not
-    :param _kwargs: (dict) Extra keyword arguments for the nature CNN feature extraction
-    """
-
-    def __init__(self, sess, ob_space, ac_space, n_env, n_steps, n_batch, reuse=False, **_kwargs):
-        super(MlpValue, self).__init__(sess, ob_space, ac_space, n_env, n_steps, n_batch, reuse,
-                                        feature_extraction="mlp", **_kwargs)
-
+        """
+        Returns the value for a single step
+        :param obs: ([float] or [int]) The current observation of the environment
+        :param state: ([float]) The last states (used in recurrent policies)
+        :param mask: ([float]) The last masks (used in recurrent policies)
+        :return: ([float]) The associated value of the action
+        """
+        raise NotImplementedError
 
 class RNDFeedForward(RNDActorCriticPolicy):
     """
@@ -428,7 +469,7 @@ class RNDFeedForward(RNDActorCriticPolicy):
     :param kwargs: (dict) Extra keyword arguments for the nature CNN feature extraction
     """
 
-    def __init__(self, sess, ob_space, ac_space, n_env, n_steps, n_batch, reuse=False, layers=None, net_arch=None,
+    def __init__(self, sess, ob_space, v_latent, ac_space, n_env, n_steps, n_batch, reuse=False, layers=None, net_arch=None,
                  act_fun=tf.tanh, cnn_extractor=nature_cnn, feature_extraction="cnn", **kwargs):
         super(RNDFeedForward, self).__init__(sess, ob_space, ac_space, n_env, n_steps, n_batch, reuse=reuse,
                                                 scale=(feature_extraction == "cnn"))
@@ -480,8 +521,8 @@ class RndValue(RNDFeedForward):
     :param _kwargs: (dict) Extra keyword arguments for the nature CNN feature extraction
     """
 
-    def __init__(self, sess, ob_space, ac_space, n_env, n_steps, n_batch, reuse=False, **_kwargs):
-        super(RndValue, self).__init__(sess, ob_space, ac_space, n_env, n_steps, n_batch, reuse,
+    def __init__(self, sess, ob_space, v_latent, ac_space, n_env, n_steps, n_batch, reuse=False, **_kwargs):
+        super(RndValue, self).__init__(sess, ob_space, v_latent, ac_space, n_env, n_steps, n_batch, reuse,
                                         feature_extraction="mlp", **_kwargs)
 
 

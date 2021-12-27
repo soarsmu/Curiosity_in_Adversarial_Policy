@@ -52,7 +52,7 @@ parser.add_argument("--adv_net", type=str, default='MLP')
 # learning rate scheduler
 parser.add_argument("--lr_sch", type=str, default='linear')
 # number of steps / lstm length should be small
-parser.add_argument("--nsteps", type=int, default=2046)
+parser.add_argument("--nsteps", type=int, default=2048)
 
 # victim loss coefficient.
 parser.add_argument("--vic_coef_init", type=int, default=1) # positive
@@ -73,7 +73,7 @@ parser.add_argument("--load", type=int, default=0)
 parser.add_argument("--render", type=int, default=0)
 
 # the type of algorithm, select: regular, rnd_policy
-parser.add_argument("--algorithm", type=str, default='regular')
+parser.add_argument("--algorithm", type=str, default='rnd_policy')
 
 # explore coefficient
 parser.add_argument("--explore", type=float, default='1')

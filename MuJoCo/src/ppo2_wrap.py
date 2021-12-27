@@ -1095,11 +1095,11 @@ class MyPPO_RND(ActorCriticRLModel):
 
 
                 # Define RND base network and RND network
-                rnd_base_network = RndValue(self.sess, self.observation_space, self.action_space, self.n_envs, 1,
+                rnd_base_network = RndValue(self.sess, self.observation_space, vtrain_model.vf_latent, self.action_space, self.n_envs, 1,
                                                  n_batch_step)
 
                 with tf.variable_scope("rnd_model", reuse=tf.AUTO_REUSE):
-                    rnd_network = RndValue(self.sess, self.observation_space, self.action_space, self.n_envs, 1,
+                    rnd_network = RndValue(self.sess, self.observation_space, vtrain_model.vf_latent,  self.action_space, self.n_envs, 1,
                                                  n_batch_step)
 
                     rnd_model = self.policy(self.sess, self.observation_space, self.action_space,
@@ -1160,9 +1160,19 @@ class MyPPO_RND(ActorCriticRLModel):
                     vf_losses1 = tf.square(vpred - self.rewards_ph)
                     vf_losses2 = tf.square(vpredclipped - self.rewards_ph)
 
-                    target_features = rnd_network.value_flat
+                    target_features = vtrain_model.rnd_flat
                     # target_features = rnd_network.value_flat
                     # self.rnd_loss = .5 * tf.square(predict_features - target_features)
+                    def value(self, obs, state=None, mask=None):
+                        """
+                        Returns the value for a single step
+                        :param obs: ([float] or [int]) The current observation of the environment
+                        :param state: ([float]) The last states (used in recurrent policies)
+                        :param mask: ([float]) The last masks (used in recurrent policies)
+                        :return: ([float]) The associated value of the action
+                        """
+                        raise NotImplementedError
+
                     self.rnd_loss = .5 * tf.reduce_mean(tf.square(target_features - tf.stop_gradient(self.predict_features)))
 
                     # rnd_value_loss
@@ -1256,7 +1266,7 @@ class MyPPO_RND(ActorCriticRLModel):
                         grads, _grad_norm = tf.clip_by_global_norm(grads, self.max_grad_norm)
                     grads = list(zip(grads, self.params[0]))
 
-                    grads_value = tf.gradients(self.opp_vf_loss, self.params[1])
+                    grads_value = tf.gradients([self.opp_vf_loss, self.rnd_loss], self.params[1])
                     if self.max_grad_norm is not None:
                         grads_value, _grad_norm_value = tf.clip_by_global_norm(grads_value, self.max_grad_norm)
                     grads_value = list(zip(grads_value, self.params[1]))
@@ -1281,8 +1291,8 @@ class MyPPO_RND(ActorCriticRLModel):
                 trainer_value1 = tf.train.AdamOptimizer(learning_rate=self.learning_rate_ph, epsilon=1e-5)
                 self._train_value1 = trainer_value1.apply_gradients(grads_value1)
 
-                trainer_rnd = tf.train.AdamOptimizer(learning_rate=self.learning_rate_ph, epsilon=1e-5)
-                self._train_rnd = trainer_rnd.apply_gradients(grads_rnd)
+                # trainer_rnd = tf.train.AdamOptimizer(learning_rate=self.learning_rate_ph, epsilon=1e-5)
+                # self._train_rnd = trainer_rnd.apply_gradients(grads_rnd)
 
                 self.loss_names = ['policy_loss', 'value_loss', 'policy_entropy', 'approxkl', 'clipfrac',
                                    '_opp_value_loss', 'opp_policy_loss', 'adv_policy_loss', 'abs_policy_loss', 'rnd_loss', 'rnd_vf_loss']
@@ -1466,10 +1476,16 @@ class MyPPO_RND(ActorCriticRLModel):
             update_fac = self.n_batch // self.nminibatches // self.noptepochs // self.n_steps + 1
 
         assert (writer == None, print('only support none writer'))
+        # policy_loss, value_loss, policy_entropy, approxkl, clipfrac, _, \
+        # _, _, opp_vf_loss, opp_pg_loss, adv_pg_loss, abs_pg_loss, rnd_loss, rnd_vf_loss = self.sess.run(
+        #     [self.pg_loss, self.vf_loss, self.entropy, self.approxkl, self.clipfrac, self._train,
+        #      self._train_value, self._train_rnd, self.opp_vf_loss, self.opp_pg_loss, self.adv_pg_loss, \
+        #      self.abs_pg_loss, self.rnd_loss, self.rnd_vf_loss], td_map)
+
         policy_loss, value_loss, policy_entropy, approxkl, clipfrac, _, \
-        _, _, opp_vf_loss, opp_pg_loss, adv_pg_loss, abs_pg_loss, rnd_loss, rnd_vf_loss = self.sess.run(
+        _, opp_vf_loss, opp_pg_loss, adv_pg_loss, abs_pg_loss, rnd_loss, rnd_vf_loss = self.sess.run(
             [self.pg_loss, self.vf_loss, self.entropy, self.approxkl, self.clipfrac, self._train,
-             self._train_value, self._train_rnd, self.opp_vf_loss, self.opp_pg_loss, self.adv_pg_loss, \
+             self._train_value, self.opp_vf_loss, self.opp_pg_loss, self.adv_pg_loss, \
              self.abs_pg_loss, self.rnd_loss, self.rnd_vf_loss], td_map)
 
         return policy_loss, value_loss, policy_entropy, approxkl, clipfrac, \
@@ -1850,8 +1866,8 @@ class Runner(AbstractEnvRunner):
             obs_adv = np.copy(self.obs)
 
             # calculate the rnd loss
-            predicted_features = self.rnd_base_network.value(self.obs, self.states, self.dones)
-            target_features = self.rnd_network.value(self.obs, self.states, self.dones)
+            predicted_features, _ = self.v_model.rnd_base_value(self.obs, self.states, self.dones)
+            target_features, _ = self.v_model.rnd_value(self.obs, self.states, self.dones)
             intrinsic_value = self.rnd_model.value(self.obs, self.states, self.dones)
 
             mb_predicted_features.append(predicted_features)
@@ -1961,7 +1977,8 @@ class Runner(AbstractEnvRunner):
             mb_abs_advs[step] = abs_last_gae_lam = abs_delta + self.gamma * self.lam * nextnonterminal * abs_last_gae_lam
 
             rnd_delta = mb_intrinsic_reward[step] + self.gamma * rnd_nextvalues * nextnonterminal - mb_intrinsic_value[step]
-            mb_intrinsic_advs[step] = rnd_last_gae_lam = rnd_delta + self.gamma * self.lam * nextnonterminal * rnd_last_gae_lam
+            rnd_last_gae_lam = rnd_delta + self.gamma * self.lam * nextnonterminal * rnd_last_gae_lam
+            mb_intrinsic_advs[step] = rnd_last_gae_lam
 
         mb_returns = mb_advs + mb_values
         mb_opp_returns = mb_opp_advs + mb_opp_values
