@@ -10,11 +10,3 @@ The requirements of each game are listed in ```requirements.txt``` under the cor
 
 ## Code structure and instructions 
 Detailed instructions about the environment configuration and agent training can be found in ```run.md ```.
-
-## Contact
-Wenbo Guo: ```wzg13@ist.psu.edu```.
-
-## Citation
-```
-W.Guo, X. Wu, S. Huang, X. Xing, "Adversarial Policy Learning in Two-player Competitive Games", In ICML 2021.
-```
