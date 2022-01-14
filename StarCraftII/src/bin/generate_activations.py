@@ -31,9 +31,9 @@ flags.DEFINE_enum("difficulty", '1',
                   ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'A'],
                   "Bot's strength.")
 
-flags.DEFINE_string("model_path", "/home/xkw5132/wuxian/rl_newloss/StarCraftII/adv-agent/our_attack/checkpoint-1050000-1", "Filepath to load initial model.")
+flags.DEFINE_string("model_path", "//wuxian/rl_newloss/StarCraftII/adv-agent/our_attack/checkpoint-1050000-1", "Filepath to load initial model.")
 flags.DEFINE_string("model_type", "our_adv")
-flags.DEFINE_string("victim_path", "/home/xkw5132/wuxian/rl_newloss/StarCraftII/normal-agent/checkpoint-100000", "victim_path")
+flags.DEFINE_string("victim_path", "//wuxian/rl_newloss/StarCraftII/normal-agent/checkpoint-100000", "victim_path")
 flag.DEFINE_string("out_path", '../../results/gmm')
 
 
