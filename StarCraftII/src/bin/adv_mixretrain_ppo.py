@@ -48,8 +48,8 @@ flags.DEFINE_boolean("use_action_mask", True, "Use region-wise combat.")
 flags.DEFINE_string("reward_shaping_type", "None", "type of reward shaping.")
 
 # opponent model related hyperparameters.
-flags.DEFINE_string("opp_model_path", '/home/wenbo/target-agent/checkpoint-1050000-2', "Opponent Model Path")
-flags.DEFINE_string("norm_model_path", '/home/wenbo/target-agent/checkpoint-1050000-2', "Norm Model Path")
+flags.DEFINE_string("opp_model_path", '/home//target-agent/checkpoint-1050000-2', "Opponent Model Path")
+flags.DEFINE_string("norm_model_path", '/home//target-agent/checkpoint-1050000-2', "Norm Model Path")
 flags.DEFINE_float("mix_ratio", 0.5, "ratio of playing with adv-agent")
 flags.DEFINE_boolean("use_victim_ob", False, "whether use victim obs")
 
@@ -80,8 +80,8 @@ flags.DEFINE_integer("batch_size", 8, "Batch size.") # batch_size * unroll_lengt
 flags.DEFINE_float("learning_rate", 1e-5, "Learning rate.")
 
 # save and print.
-flags.DEFINE_string("init_model_path", '/home/wenbo/target-agent/checkpoint-100000', "Initial model path.")
-flags.DEFINE_string("save_dir", "/home/wenbo/adv_shape_v1/", "Dir to save models to")
+flags.DEFINE_string("init_model_path", '/home//target-agent/checkpoint-100000', "Initial model path.")
+flags.DEFINE_string("save_dir", "/home//adv_shape_v1/", "Dir to save models to")
 flags.DEFINE_integer("save_interval", 50000, "Model saving frequency.")
 flags.DEFINE_integer("print_interval", 1000, "Print train cost frequency.")
 

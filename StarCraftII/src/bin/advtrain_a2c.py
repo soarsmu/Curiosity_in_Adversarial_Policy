@@ -48,7 +48,7 @@ flags.DEFINE_boolean("use_action_mask", True, "Use region-wise combat.")
 flags.DEFINE_string("reward_shaping_type", "v1", "type of reward shaping.")
 
 # opponent model related hyperparameters.
-flags.DEFINE_string("opp_model_path", '/home/wenbo/target-agent/checkpoint-100000', "Opponent Model Path")
+flags.DEFINE_string("opp_model_path", '/home//target-agent/checkpoint-100000', "Opponent Model Path")
 flags.DEFINE_boolean("use_victim_ob", False, "whether use victim obs")
 
 # loss function related hyperparameters
@@ -79,7 +79,7 @@ flags.DEFINE_float("learning_rate", 1e-5, "Learning rate.")
 
 # save and print.
 flags.DEFINE_string("init_model_path", None, "Initial model path.")
-flags.DEFINE_string("save_dir", "/home/wenbo/adv_a2c/", "Dir to save models to")
+flags.DEFINE_string("save_dir", "/home//adv_a2c/", "Dir to save models to")
 flags.DEFINE_integer("save_interval", 50000, "Model saving frequency.")
 flags.DEFINE_integer("print_interval", 1000, "Print train cost frequency.")
 flags.FLAGS(sys.argv)
