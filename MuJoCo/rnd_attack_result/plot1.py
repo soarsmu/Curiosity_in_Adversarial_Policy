@@ -8,7 +8,7 @@ import os
 for root, dirs ,files in os.walk('./'):
     break
 envs = ['KickAndDefend', 'RunToGoalAnts', 'SumoAnts', 'SumoHumans', 'YouShallNotPass']
-algos = ['attack1 ICLR', 'attack2 ICML', 'our attack']
+algos = ['attack1 ', 'attack2 ', 'our attack']
 shuffixs = ['nonloss', 'win']
 alpha = 0.4
 point_num = 100

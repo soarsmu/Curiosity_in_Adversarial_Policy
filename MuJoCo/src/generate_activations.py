@@ -168,9 +168,9 @@ if __name__ == "__main__":
     p.add_argument("--norm_path", default="../adv-agent/rnd_attack/suhuman/obs_rms.pkl", type=str)
 
     #SumoAnts
-    # #p.add_argument("--opp-path", default="/home/gc/attack_rl/rl_adv_valuediff/MuJoCo/multiagent-competition/agent-zoo/sumo/ants/agent_parameters-v4.pkl", type=str)
+    # #p.add_argument("--opp-path", default="/attack_rl/rl_adv_valuediff/MuJoCo/multiagent-competition/agent-zoo/sumo/ants/agent_parameters-v4.pkl", type=str)
     # p.add_argument("--opp_path", default="../adv-agent/rnd_attack/suant/model.pkl", type=str)
-    # p.add_argument("--vic_path", default="/home/gc/attack_rl/rl_adv_valuediff/MuJoCo/multiagent-competition/agent-zoo/sumo/ants/agent_parameters-v1.pkl", type=str)
+    # p.add_argument("--vic_path", default="/attack_rl/rl_adv_valuediff/MuJoCo/multiagent-competition/agent-zoo/sumo/ants/agent_parameters-v1.pkl", type=str)
     # p.add_argument("--norm_path", default="../adv-agent/rnd_attack/suant/obs_rms.pkl", type=str)
 
     # RuntoGoalAnts

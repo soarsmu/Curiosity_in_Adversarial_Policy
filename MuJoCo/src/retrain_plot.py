@@ -219,8 +219,8 @@ def plot_data(log_dir, out_dir, filename, game, length=350, reverse=False):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--num_seed", type=int, default=5)
-    parser.add_argument('--log_dir', type=str, default='/home/gc/attack_rl/rl_adv_valuediff/MuJoCo/retrained-ICML')
-    parser.add_argument("--out_dir", type=str, default='/home/gc/attack_rl/rl_adv_valuediff/MuJoCo/retrained-ICML')
+    parser.add_argument('--log_dir', type=str, default='/attack_rl/rl_adv_valuediff/MuJoCo/retrained-')
+    parser.add_argument("--out_dir", type=str, default='/attack_rl/rl_adv_valuediff/MuJoCo/retrained-')
     parser.add_argument("--filename", type=str, default='out.png')
     args = parser.parse_args()
     out_dir = args.out_dir

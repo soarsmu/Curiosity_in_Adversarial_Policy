@@ -204,8 +204,8 @@ class AnnotatedGymCompete(gym.Wrapper):
 
 
         # Text overlay
-        self.font = ImageFont.truetype('/home/gc/attack_rl/demo/arial.ttf', font_size)
-        self.font_bold = ImageFont.truetype('/home/gc/attack_rl/demo/arial.ttf', font_size)
+        self.font = ImageFont.truetype('/attack_rl/demo/arial.ttf', font_size)
+        self.font_bold = ImageFont.truetype('/attack_rl/demo/arial.ttf', font_size)
         self.short_labels = short_labels
         self.ypos = ypos
         self.spacing = spacing

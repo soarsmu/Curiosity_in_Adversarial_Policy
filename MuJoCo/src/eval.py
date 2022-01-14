@@ -199,10 +199,10 @@ if __name__ == "__main__":
     p.add_argument('--pi1_norm_path', type=str)
     p.add_argument('--log', type=str)
 
-    # p.add_argument('--pi1_path', default='/home/gc/attack_rl/rl_adv_valuediff/MuJoCo/multiagent-competition/agent-zoo/kick-and-defend/kicker/agent1_parameters-v1.pkl')
-    # p.add_argument('--pi1_norm_path', default="/home/gc/attack_rl/rl_adv_valuediff/MuJoCo/multiagent-competition/agent-zoo/kick-and-defend/kicker/agent1_parameters-v1.pkl")
-    # p.add_argument('--pi0_path', default='/home/gc/attack_rl/rl_adv_valuediff/MuJoCo/adv-baseline/KickAndDefend/our_method/20211122_014022-0/checkpoints/000019906560/model.pkl')
-    # p.add_argument('--pi0_norm_path', default='/home/gc/attack_rl/rl_adv_valuediff/MuJoCo/adv-baseline/KickAndDefend/our_method/20211122_014022-0/checkpoints/000019906560/obs_rms.pkl')
+    # p.add_argument('--pi1_path', default='/attack_rl/rl_adv_valuediff/MuJoCo/multiagent-competition/agent-zoo/kick-and-defend/kicker/agent1_parameters-v1.pkl')
+    # p.add_argument('--pi1_norm_path', default="/attack_rl/rl_adv_valuediff/MuJoCo/multiagent-competition/agent-zoo/kick-and-defend/kicker/agent1_parameters-v1.pkl")
+    # p.add_argument('--pi0_path', default='/attack_rl/rl_adv_valuediff/MuJoCo/adv-baseline/KickAndDefend/our_method/20211122_014022-0/checkpoints/000019906560/model.pkl')
+    # p.add_argument('--pi0_norm_path', default='/attack_rl/rl_adv_valuediff/MuJoCo/adv-baseline/KickAndDefend/our_method/20211122_014022-0/checkpoints/000019906560/obs_rms.pkl')
     config = p.parse_args()    
     run(config)
    # our retrained vic.

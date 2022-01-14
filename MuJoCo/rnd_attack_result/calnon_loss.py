@@ -1,7 +1,7 @@
 import numpy as np
 import os
 envs = ['KickAndDefend', 'RunToGoalAnts', 'SumoAnts', 'SumoHumans', 'YouShallNotPass']
-algos = ['attack1 ICLR', 'attack2 ICML', 'our attack']
+algos = ['attack1 ', 'attack2 ', 'our attack']
 tie_prefix = 'rnd_attack_tie'
 win_prefix = 'rnd_attack_win'
 non_loss_prefix = './rnd_attack_nonloss'

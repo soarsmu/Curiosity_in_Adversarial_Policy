@@ -8,7 +8,7 @@ import os
 for root, dirs ,files in os.walk('./'):
     break
 envs = ['KickAndDefend', 'SumoAnts', 'RunToGoalAnts', 'YouShallNotPass', 'SumoHumans'] #
-algos = ['our attack'] # 'attack1 ICLR', 'attack2 ICML',
+algos = ['our attack'] # 'attack1 ', 'attack2 ',
 shuffixs = ['nonloss', 'win']
 sns.set_style("darkgrid")
 colors = sns.color_palette()

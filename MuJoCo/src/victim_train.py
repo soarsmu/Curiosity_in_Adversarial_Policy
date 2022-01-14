@@ -33,22 +33,22 @@ parser.add_argument("--n_games", type=int, default=8) # N_GAME = 8
 parser.add_argument("--vic_agt_id", type=int, default=1)
 
 # kickAndDefend
-# /home/gc/attack_rl/rl_adv_valuediff/MuJoCo/adv-baseline/KickAndDefend/our_method/20211122_014022-0/checkpoints/000019906560
+# /attack_rl/rl_adv_valuediff/MuJoCo/adv-baseline/KickAndDefend/our_method/20211122_014022-0/checkpoints/000019906560
 # YouShallNotPass
-# /home/gc/attack_rl/rl_adv_valuediff/MuJoCo/adv-baseline/YouShallNotPass/our_method/20211203_130414-1/checkpoints/000019906560
-# /home/gc/attack_rl/rl_adv_valuediff/MuJoCo/adv-baseline/YouShallNotPass/our_method/20211123_231545-2/checkpoints/000019906560
+# /attack_rl/rl_adv_valuediff/MuJoCo/adv-baseline/YouShallNotPass/our_method/20211203_130414-1/checkpoints/000019906560
+# /attack_rl/rl_adv_valuediff/MuJoCo/adv-baseline/YouShallNotPass/our_method/20211123_231545-2/checkpoints/000019906560
 # SumoAnts
-# /home/gc/attack_rl/rl_adv_valuediff/MuJoCo/adv-baseline/SumoAnts/our_method/20211119_204919-3/checkpoints/000019906560
+# /attack_rl/rl_adv_valuediff/MuJoCo/adv-baseline/SumoAnts/our_method/20211119_204919-3/checkpoints/000019906560
 # SumoHumans
-# /home/gc/attack_rl/rl_adv_valuediff/MuJoCo/adv-baseline/SumoHumans/our_method/20211202_120529-0/checkpoints/000019906560
-# /home/gc/attack_rl/rl_adv_valuediff/MuJoCo/adv-baseline/SumoHumans/our_method/20211202_022122-1/checkpoints/000019906560
+# /attack_rl/rl_adv_valuediff/MuJoCo/adv-baseline/SumoHumans/our_method/20211202_120529-0/checkpoints/000019906560
+# /attack_rl/rl_adv_valuediff/MuJoCo/adv-baseline/SumoHumans/our_method/20211202_022122-1/checkpoints/000019906560
 # RunToGoalAnts
-# /home/gc/attack_rl/rl_adv_valuediff/MuJoCo/adv-baseline/RunToGoalAnts/our_method/20211118_151712-3/checkpoints/000019906560
+# /attack_rl/rl_adv_valuediff/MuJoCo/adv-baseline/RunToGoalAnts/our_method/20211118_151712-3/checkpoints/000019906560
 # adversarial agent path
-parser.add_argument("--adv_path", type=str, default='/home/gc/attack_rl/rl_adv_valuediff/MuJoCo/adv-baseline/SumoHumans/our_method/20211202_022122-1/checkpoints/000019906560/model.pkl')
+parser.add_argument("--adv_path", type=str, default='/attack_rl/rl_adv_valuediff/MuJoCo/adv-baseline/SumoHumans/our_method/20211202_022122-1/checkpoints/000019906560/model.pkl')
 parser.add_argument("--adv_ismlp", type=bool, default=True)
 # adversarial agent's observation norm mean / variance path
-parser.add_argument("--adv_obs_normpath", type=str, default='/home/gc/attack_rl/rl_adv_valuediff/MuJoCo/adv-baseline/SumoHumans/our_method/20211202_022122-1/checkpoints/000019906560/obs_rms.pkl')
+parser.add_argument("--adv_obs_normpath", type=str, default='/attack_rl/rl_adv_valuediff/MuJoCo/adv-baseline/SumoHumans/our_method/20211202_022122-1/checkpoints/000019906560/obs_rms.pkl')
 # victim agent network
 parser.add_argument("--vic_net", type=str, default='LSTM')
 

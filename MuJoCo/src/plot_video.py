@@ -32,9 +32,9 @@ parser.add_argument("--env", type=int, default=5)
 parser.add_argument("--n_games", type=int, default=1) # N_GAME = 8
 
 parser.add_argument("--agent_a_type", type=str, default="zoo")
-parser.add_argument("--agent_a_path", type=str, default="/home/gc/attack_rl/rl_adv_valuediff/MuJoCo/multiagent-competition/agent-zoo/sumo/humans/agent_parameters-v3.pkl")
+parser.add_argument("--agent_a_path", type=str, default="/attack_rl/rl_adv_valuediff/MuJoCo/multiagent-competition/agent-zoo/sumo/humans/agent_parameters-v3.pkl")
 parser.add_argument("--agent_b_type", type=str, default="zoo")
-parser.add_argument("--agent_b_path", type=str, default="/home/gc/attack_rl/rl_adv_valuediff/MuJoCo/multiagent-competition/agent-zoo/sumo/humans/agent_parameters-v3.pkl")
+parser.add_argument("--agent_b_path", type=str, default="/attack_rl/rl_adv_valuediff/MuJoCo/multiagent-competition/agent-zoo/sumo/humans/agent_parameters-v3.pkl")
 parser.add_argument("--norm_path", type=str, default=None)
 
 parser.add_argument("--render", type=bool, default=True)
@@ -42,7 +42,7 @@ parser.add_argument("--episodes", type=int, default=3)
 parser.add_argument("--timesteps", type=int, default=None)
 
 parser.add_argument("--video", type=bool, default=True)
-parser.add_argument("--save_dir", type=str, default="/home/gc/attack_rl/rl_adv_valuediff/demo")
+parser.add_argument("--save_dir", type=str, default="/attack_rl/rl_adv_valuediff/demo")
 
 
 args = parser.parse_args()

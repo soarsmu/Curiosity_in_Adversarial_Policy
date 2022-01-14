@@ -48,7 +48,7 @@ flags.DEFINE_boolean("use_action_mask", True, "Use region-wise combat.")
 flags.DEFINE_string("reward_shaping_type", "None", "type of reward shaping.")
 
 # opponent model related hyperparameters.
-flags.DEFINE_string("opp_model_path", '/home/gc/attack_rl/rl_adv_valuediff/StarCraftII/adv-agent/ucb/checkpoint-800000-2', "Opponent Model Path")
+flags.DEFINE_string("opp_model_path", '/attack_rl/rl_adv_valuediff/StarCraftII/adv-agent/ucb/checkpoint-800000-2', "Opponent Model Path")
 flags.DEFINE_boolean("use_victim_ob", False, "whether use victim obs")
 
 # loss function related hyperparameters
@@ -78,7 +78,7 @@ flags.DEFINE_integer("batch_size", 8, "Batch size.") # batch_size * unroll_lengt
 flags.DEFINE_float("learning_rate", 1e-5, "Learning rate.")
 
 # save and print.
-flags.DEFINE_string("init_model_path", '/home/gc/attack_rl/rl_adv_valuediff/StarCraftII/normal-agent/checkpoint-100000', "Initial model path.")
+flags.DEFINE_string("init_model_path", '/attack_rl/rl_adv_valuediff/StarCraftII/normal-agent/checkpoint-100000', "Initial model path.")
 flags.DEFINE_string("save_dir", "./model/", "Dir to save models to")
 flags.DEFINE_integer("save_interval", 50000, "Model saving frequency.")
 flags.DEFINE_integer("print_interval", 1000, "Print train cost frequency.")

@@ -10,7 +10,7 @@ import os
 # KickAndDefend
 env = 'YouShallNotPass'
 log_dir = './eval_results/YouShallNotPass'
-env_dir = '/home/gc/attack_rl/rl_adv_valuediff/MuJoCo/adv-baseline/icml2021/YouShallNotPass'
+env_dir = '/attack_rl/rl_adv_valuediff/MuJoCo/adv-baseline/2021/YouShallNotPass'
 for _, dirs, files in os.walk(log_dir):
     break
 for _, seeds, _ in os.walk(env_dir):

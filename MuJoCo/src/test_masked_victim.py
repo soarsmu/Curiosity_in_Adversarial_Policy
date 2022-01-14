@@ -155,27 +155,27 @@ if __name__ == "__main__":
     # p.add_argument("--norm_path", default="../adv-agent/our_attack/you/obs_rms.pkl", type=str)
 
     # KickAndDefend ../adv-agent/our_attack/kick/model.pkl
-    # p.add_argument("--opp-path", default="/home/gc/attack_rl/rl_adv_valuediff/MuJoCo/adv-baseline/KickAndDefend/our_method/20211122_014022-0/checkpoints/000019906560/model.pkl", type=str)
+    # p.add_argument("--opp-path", default="/attack_rl/rl_adv_valuediff/MuJoCo/adv-baseline/KickAndDefend/our_method/20211122_014022-0/checkpoints/000019906560/model.pkl", type=str)
     # p.add_argument("--vic_path", default="../multiagent-competition/agent-zoo/kick-and-defend/kicker/agent1_parameters-v1.pkl", type=str)
-    # p.add_argument("--norm_path", default="/home/gc/attack_rl/rl_adv_valuediff/MuJoCo/adv-baseline/KickAndDefend/our_method/20211122_014022-0/checkpoints/000019906560/obs_rms.pkl", type=str)
+    # p.add_argument("--norm_path", default="/attack_rl/rl_adv_valuediff/MuJoCo/adv-baseline/KickAndDefend/our_method/20211122_014022-0/checkpoints/000019906560/obs_rms.pkl", type=str)
 
     # SumoHumans ../adv-agent/our_attack/humans/model.pkl
-    # p.add_argument("--opp-path", default="/home/gc/attack_rl/rl_adv_valuediff/MuJoCo/adv-baseline/SumoHumans/our_method/20211202_022122-1/checkpoints/000019906560/model.pkl", type=str)
+    # p.add_argument("--opp-path", default="/attack_rl/rl_adv_valuediff/MuJoCo/adv-baseline/SumoHumans/our_method/20211202_022122-1/checkpoints/000019906560/model.pkl", type=str)
     # p.add_argument("--vic_path", default="../multiagent-competition/agent-zoo/sumo/humans/agent_parameters-v1.pkl", type=str)
-    # p.add_argument("--norm_path", default="/home/gc/attack_rl/rl_adv_valuediff/MuJoCo/adv-baseline/SumoHumans/our_method/20211202_022122-1/checkpoints/000019906560/obs_rms.pkl", type=str)
+    # p.add_argument("--norm_path", default="/attack_rl/rl_adv_valuediff/MuJoCo/adv-baseline/SumoHumans/our_method/20211202_022122-1/checkpoints/000019906560/obs_rms.pkl", type=str)
 
-    # RunToGoalAnts /home/gc/attack_rl/rl_adv_valuediff/MuJoCo/adv-baseline/RunToGoalAnts/our_method/20211118_151712-3/checkpoints/000019906560
-    # p.add_argument("--opp_path", default="/home/gc/attack_rl/rl_adv_valuediff/MuJoCo/adv-baseline/RunToGoalAnts/our_method/20211118_151712-3/checkpoints/000019906560/model.pkl", type=str)
+    # RunToGoalAnts /attack_rl/rl_adv_valuediff/MuJoCo/adv-baseline/RunToGoalAnts/our_method/20211118_151712-3/checkpoints/000019906560
+    # p.add_argument("--opp_path", default="/attack_rl/rl_adv_valuediff/MuJoCo/adv-baseline/RunToGoalAnts/our_method/20211118_151712-3/checkpoints/000019906560/model.pkl", type=str)
     # p.add_argument("--vic_path", default="../multiagent-competition/agent-zoo/run-to-goal/ants/agent2_parameters-v1.pkl", type=str)
-    # p.add_argument("--norm_path", default="/home/gc/attack_rl/rl_adv_valuediff/MuJoCo/adv-baseline/RunToGoalAnts/our_method/20211118_151712-3/checkpoints/000019906560/obs_rms.pkl", type=str)
+    # p.add_argument("--norm_path", default="/attack_rl/rl_adv_valuediff/MuJoCo/adv-baseline/RunToGoalAnts/our_method/20211118_151712-3/checkpoints/000019906560/obs_rms.pkl", type=str)
 
     # SumoAnts
-    # /home/gc/attack_rl/rl_adv_valuediff/MuJoCo/adv-baseline/SumoAnts/our_method/20211119_204919-3/checkpoints/000019906560
-    # /home/gc/attack_rl/rl_adv_valuediff/MuJoCo/agent-zoo/SumoAnts-v0_1_MLP_MLP_1_const_-1_const_0_const_False/20211213_203238-4/checkpoints/000019906560
-    # icml: /home/gc/attack_rl/rl_adv_valuediff/MuJoCo/adv-baseline/SumoAnts/icml2021_mlp/20211021_124044-3/checkpoints/000019906560
-    p.add_argument("--opp-path", default="/home/gc/attack_rl/rl_adv_valuediff/MuJoCo/adv-baseline/SumoAnts/icml2021_mlp/20211021_124044-3/checkpoints/000019906560/model.pkl", type=str)
+    # /attack_rl/rl_adv_valuediff/MuJoCo/adv-baseline/SumoAnts/our_method/20211119_204919-3/checkpoints/000019906560
+    # /attack_rl/rl_adv_valuediff/MuJoCo/agent-zoo/SumoAnts-v0_1_MLP_MLP_1_const_-1_const_0_const_False/20211213_203238-4/checkpoints/000019906560
+    # : /attack_rl/rl_adv_valuediff/MuJoCo/adv-baseline/SumoAnts/2021_mlp/20211021_124044-3/checkpoints/000019906560
+    p.add_argument("--opp-path", default="/attack_rl/rl_adv_valuediff/MuJoCo/adv-baseline/SumoAnts/2021_mlp/20211021_124044-3/checkpoints/000019906560/model.pkl", type=str)
     p.add_argument("--vic_path", default="../multiagent-competition/agent-zoo/sumo/ants/agent_parameters-v2.pkl", type=str)
-    p.add_argument("--norm_path", default="/home/gc/attack_rl/rl_adv_valuediff/MuJoCo/adv-baseline/SumoAnts/icml2021_mlp/20211021_124044-3/checkpoints/000019906560/obs_rms.pkl", type=str)
+    p.add_argument("--norm_path", default="/attack_rl/rl_adv_valuediff/MuJoCo/adv-baseline/SumoAnts/2021_mlp/20211021_124044-3/checkpoints/000019906560/obs_rms.pkl", type=str)
 
     p.add_argument("--vic_mask", default=False, type=bool)
     p.add_argument("--max-episodes", default=100, help="max number of matches", type=int)
