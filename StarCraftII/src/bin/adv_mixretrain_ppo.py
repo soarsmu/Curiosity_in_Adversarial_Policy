@@ -20,6 +20,7 @@ import datetime
 from agents.ppo_policies import LstmPolicy, MlpPolicy
 from agents.ppo_values import LstmValue, MlpValue
 from agents.ppo2_retrain import PPO_AdvActor, Adv_Learner
+#from agents.ppo2_wrap import PPO_AdvActor, Adv_Learner
 
 from envs.raw_env import SC2RawEnv
 from envs.selfplay_raw_env import SC2SelfplayRawEnv
@@ -48,8 +49,8 @@ flags.DEFINE_boolean("use_action_mask", True, "Use region-wise combat.")
 flags.DEFINE_string("reward_shaping_type", "None", "type of reward shaping.")
 
 # opponent model related hyperparameters.
-flags.DEFINE_string("opp_model_path", '/home//target-agent/checkpoint-1050000-2', "Opponent Model Path")
-flags.DEFINE_string("norm_model_path", '/home//target-agent/checkpoint-1050000-2', "Norm Model Path")
+flags.DEFINE_string("opp_model_path", '../model/retrain_model/checkpoint-1200000', "Opponent Model Path")
+flags.DEFINE_string("norm_model_path", '../model/retrain_model/checkpoint-1200000', "Norm Model Path")
 flags.DEFINE_float("mix_ratio", 0.5, "ratio of playing with adv-agent")
 flags.DEFINE_boolean("use_victim_ob", False, "whether use victim obs")
 
@@ -79,9 +80,9 @@ flags.DEFINE_integer("game_steps_per_episode", 43200, "Maximum steps per episode
 flags.DEFINE_integer("batch_size", 8, "Batch size.") # batch_size * unroll_length
 flags.DEFINE_float("learning_rate", 1e-5, "Learning rate.")
 
-# save and print.
-flags.DEFINE_string("init_model_path", '/home//target-agent/checkpoint-100000', "Initial model path.")
-flags.DEFINE_string("save_dir", "/home//adv_shape_v1/", "Dir to save models to")
+# save and print
+flags.DEFINE_string("init_model_path", '../../adv-agent/ucb/checkpoint-800000-2', "Initial model path.")
+flags.DEFINE_string("save_dir", "./retrian_model", "Dir to save models to")
 flags.DEFINE_integer("save_interval", 50000, "Model saving frequency.")
 flags.DEFINE_integer("print_interval", 1000, "Print train cost frequency.")
 
@@ -239,7 +240,8 @@ def start_learner():
                           init_model_path=FLAGS.init_model_path,
                           port_A=FLAGS.port_A,
                           port_B=FLAGS.port_B,
-                          max_episode=FLAGS.max_episode,
+                          max_episode= 4,
+    #                      max_episode=FLAGS.max_episode,
                           coef_opp_init=FLAGS.vic_coef_init,
                           coef_opp_schedule=FLAGS.vic_coef_sch,
                           coef_adv_init=FLAGS.adv_coef_init,

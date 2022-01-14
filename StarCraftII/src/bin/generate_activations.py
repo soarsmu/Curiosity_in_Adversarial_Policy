@@ -31,10 +31,10 @@ flags.DEFINE_enum("difficulty", '1',
                   ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'A'],
                   "Bot's strength.")
 
-flags.DEFINE_string("model_path", "//wuxian/rl_newloss/StarCraftII/adv-agent/our_attack/checkpoint-1050000-1", "Filepath to load initial model.")
-flags.DEFINE_string("model_type", "our_adv")
-flags.DEFINE_string("victim_path", "//wuxian/rl_newloss/StarCraftII/normal-agent/checkpoint-100000", "victim_path")
-flag.DEFINE_string("out_path", '../../results/gmm')
+flags.DEFINE_string("model_path", "./model/retrain_model/checkpoint-1200000", "Filepath to load initial model.")
+flags.DEFINE_string("model_type", "our_adv", 'help')
+flags.DEFINE_string("victim_path", "../normal-agent/checkpoint-100000", "victim_path")
+flags.DEFINE_string("out_path", './results/activates/', 'help')
 
 
 flags.DEFINE_boolean("disable_fog", True, "Disable fog-of-war.")
@@ -137,6 +137,7 @@ def evaluate(game_seed):
         total_steps = 0
 
         ff_acts = []
+        i = 0
         while total_steps <= FLAGS.max_timesteps:
               observation_0, observation_1 = env.reset()
               agent.reset()
@@ -161,6 +162,7 @@ def evaluate(game_seed):
                       tie_games += 1
 
               print("Evaluated %d/%d Episodes Avg Return %f Avg Winning Rate %f Win %d Lose %d tie %d" % (i + 1, FLAGS.num_episodes, cum_return / (i + 1), ((cum_return / (i + 1)) + 1) / 2.0, win_games, loss_games, tie_games))
+              i += 1
 
         # save the ff_acts
         ff_acts = np.vstack(ff_acts)

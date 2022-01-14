@@ -43,6 +43,50 @@ class MlpValue(object):
         self.vf = vf
         self.value = value
 
+class MlpValueRND(object):
+    def __init__(self, sess, scope_name, ob_space, ac_space, nbatch, nsteps,
+                 reuse=False):
+        if isinstance(ac_space, MaskDiscrete):
+            ob_space, mask_space = ob_space.spaces
+
+        X = tf.placeholder(
+            shape=(nbatch,) + ob_space.shape, dtype=tf.float32, name="x_screen")
+        if isinstance(ac_space, MaskDiscrete):
+            MASK = tf.placeholder(
+                shape=(nbatch,) + mask_space.shape, dtype=tf.float32, name="mask")
+        with tf.variable_scope(scope_name, reuse=reuse):
+            x = tf.layers.flatten(X)
+            xx = tf.tanh(fc(x, 'xx', nh=128, init_scale=np.sqrt(2)))
+            rvf_h2 = tf.tanh(fc(xx, 'rvf_fc2', nh=128, init_scale=np.sqrt(2)))
+            rvf_h3 = tf.tanh(fc(rvf_h2, 'rvf_fc3', nh=128, init_scale=np.sqrt(2)))
+
+            rvf = fc(rvf_h3, 'rvf', 1)[:,0]
+            vf = fc(rvf_h3, 'vf', 1)[:,0]
+
+        with tf.variable_scope(scope_name + '_RND_Linear', reuse=reuse):
+            # RND FIXED LINEANR
+            rdf = fc(rvf_h3, 'rdf', 128)[:,0]
+            rdf = tf.stop_gradient(rdf)
+
+            # RND RANDOM LINEAR
+            rdr = fc(rvf_h3, 'rdr', 128)[:,0]
+
+        self.initial_state = None
+
+        def value(ob, *_args, **_kwargs):
+            if isinstance(ac_space, MaskDiscrete):
+                return sess.run([vf, rdf, rdr, rvf], {X:ob[0], MASK:ob[-1]}), None
+            else:
+                return sess.run([vf, rdf, rdr, rvf], {X:ob}), None
+
+        self.X = X
+        if isinstance(ac_space, MaskDiscrete):
+            self.MASK = MASK
+        self.vf = vf
+        self.rnd_vf = rvf
+        self.value = value
+        self.rdr = rdr
+        self.rdf = rdf
 
 class LstmValue(object):
 

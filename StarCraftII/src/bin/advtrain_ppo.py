@@ -18,7 +18,7 @@ from os import path as osp
 import datetime
 
 from agents.ppo_policies import LstmPolicy, MlpPolicy
-from agents.ppo_values import LstmValue, MlpValue
+from agents.ppo_values import LstmValue, MlpValue, MlpValueRND
 from agents.ppo2_wrap import PPO_AdvActor, Adv_Learner
 
 from envs.raw_env import SC2RawEnv
@@ -48,7 +48,7 @@ flags.DEFINE_boolean("use_action_mask", True, "Use region-wise combat.")
 flags.DEFINE_string("reward_shaping_type", "None", "type of reward shaping.")
 
 # opponent model related hyperparameters.
-flags.DEFINE_string("opp_model_path", '/attack_rl/rl_adv_valuediff/StarCraftII/adv-agent/ucb/checkpoint-800000-2', "Opponent Model Path")
+flags.DEFINE_string("opp_model_path", '../../StarCraftII/adv-agent/ucb/checkpoint-800000-2', "Opponent Model Path")
 flags.DEFINE_boolean("use_victim_ob", False, "whether use victim obs")
 
 # loss function related hyperparameters
@@ -78,7 +78,7 @@ flags.DEFINE_integer("batch_size", 8, "Batch size.") # batch_size * unroll_lengt
 flags.DEFINE_float("learning_rate", 1e-5, "Learning rate.")
 
 # save and print.
-flags.DEFINE_string("init_model_path", '/attack_rl/rl_adv_valuediff/StarCraftII/normal-agent/checkpoint-100000', "Initial model path.")
+flags.DEFINE_string("init_model_path", '../../StarCraftII/normal-agent/checkpoint-100000', "Initial model path.")
 flags.DEFINE_string("save_dir", "./model/", "Dir to save models to")
 flags.DEFINE_integer("save_interval", 50000, "Model saving frequency.")
 flags.DEFINE_integer("print_interval", 1000, "Print train cost frequency.")
@@ -179,7 +179,7 @@ def start_actor():
               'mlp': MlpPolicy}[FLAGS.policy]
 
     value = {'lstm': LstmValue,
-             'mlp': MlpValue}[FLAGS.value]
+             'mlp': MlpValueRND}[FLAGS.value]
 
     actor = PPO_AdvActor(env=env,
                          policy=policy,
@@ -206,7 +206,7 @@ def start_learner():
             'mlp': MlpPolicy}[FLAGS.policy]
 
     value = {'lstm': LstmValue,
-           'mlp': MlpValue}[FLAGS.value]
+           'mlp': MlpValueRND}[FLAGS.value]
 
     # Change the dir_name
     FLAGS.save_dir = FLAGS.save_dir  + FLAGS.vic_coef_sch + "_" + str(FLAGS.vic_coef_init) + \

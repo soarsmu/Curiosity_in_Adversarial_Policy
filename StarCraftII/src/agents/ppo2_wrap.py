@@ -66,6 +66,7 @@ class Adv_Model(object):
         A = tf.placeholder(shape=(nbatch_train,), dtype=tf.int32)
         ADV = tf.placeholder(tf.float32, [None])
         R = tf.placeholder(tf.float32, [None])
+        IR = tf.placeholder(tf.float32, [None])
         OLDNEGLOGPAC = tf.placeholder(tf.float32, [None])
         OLDVPRED = tf.placeholder(tf.float32, [None])
         LR = tf.placeholder(tf.float32, [])
@@ -83,6 +84,12 @@ class Adv_Model(object):
         abs_R = tf.placeholder(tf.float32, [None])
         abs_OLDVPRED = tf.placeholder(tf.float32, [None])
 
+        rnd_ADV = tf.placeholder(tf.float32, [None])
+        rnd_R = tf.placeholder(tf.float32, [None])
+        rnd_OLDVPRED = tf.placeholder(tf.float32, [None])
+
+        opp_ADV = opp_ADV + 0.2 * rnd_ADV
+
         neglogpac = train_model.pd.neglogp(A)
         entropy = tf.reduce_mean(train_model.pd.entropy())
 
@@ -95,7 +102,17 @@ class Adv_Model(object):
           vf_loss = .5 * tf.reduce_mean(tf.maximum(vf_losses1, vf_losses2))
         else:
           vf_loss = .5 * tf.reduce_mean(vf_losses1)
-
+        
+        # opp rnd_value_loss
+        rnd_vpred = vtrain_model.rnd_vf
+        rnd_vpredclipped = rnd_OLDVPRED + tf.clip_by_value(vtrain_model.rnd_vf- rnd_OLDVPRED, -CLIPRANGE, CLIPRANGE)
+        rnd_vf_losses1 = tf.square(rnd_vpred - rnd_R)
+        if value_clip:
+          rnd_vf_losses2 = tf.square(rnd_vpredclipped - opp_R)
+          rnd_vf_loss = .5 * tf.reduce_mean(tf.maximum(rnd_vf_losses1, rnd_vf_losses2))
+        else:
+          rnd_vf_loss = .5 * tf.reduce_mean(rnd_vf_losses1)
+        
         # opp value_loss
         opp_vpred = vtrain_model.vf
         opp_vpredclipped = opp_OLDVPRED + tf.clip_by_value(vtrain_model.vf - opp_OLDVPRED, -CLIPRANGE, CLIPRANGE)
@@ -128,16 +145,29 @@ class Adv_Model(object):
 
         # total loss, add value function
         loss = pg_loss - entropy * ent_coef + vf_loss * vf_coef + \
-               opp_vf_loss * vf_coef + diff_vf_loss * vf_coef
+               opp_vf_loss * vf_coef + diff_vf_loss * vf_coef# + vf_coef * rnd_vf_loss
+
+        rnd_loss = tf.reduce_mean((vtrain1_model.rdr - vtrain1_model.rdf) ** 2)
 
         params = tf.trainable_variables(scope=scope_name)
         params += tf.trainable_variables(scope="oppo_value")
         params += tf.trainable_variables(scope="diff_value")
 
         grads = tf.gradients(loss, params)
+
+        # rnd_params = tf.trainable_variables(scope="_RND_Linear")
+        rnd_params = tf.trainable_variables(scope = "oppo_value_RND_Linear")
+        rnd_params += tf.trainable_variables(scope = "diff_value_RND_Linear")
+        rnd_grads = tf.gradients(rnd_loss, rnd_params)
+
         if max_grad_norm is not None:
           grads, _grad_norm = tf.clip_by_global_norm(grads, max_grad_norm)
+
+        if max_grad_norm is not None:
+          rnd_grads, _rnd_grad_norm = tf.clip_by_global_norm(rnd_grads, max_grad_norm)
+ 
         grads = list(zip(grads, params))
+        rnd_grads = list(zip(rnd_grads, rnd_params))
         trainer = tf.train.AdamOptimizer(learning_rate=LR, epsilon=1e-5)
         _train = trainer.apply_gradients(grads)
         new_params = [tf.placeholder(p.dtype, shape=p.get_shape()) for p in params]
@@ -145,7 +175,7 @@ class Adv_Model(object):
 
         def train(lr, cliprange, coef_opp, coef_adv, coef_abs, obs, returns, dones, actions, values,
                   neglogpacs,  opp_obs, opp_returns, opp_values, abs_returns, abs_values,
-                  states=None, opp_states=None, abs_states=None):
+                  states=None, opp_states=None, abs_states=None, rnd_ret=None, rnd_values = None):
 
             advs = returns - values
             advs = (advs - advs.mean()) / (advs.std() + 1e-8)
@@ -156,6 +186,19 @@ class Adv_Model(object):
             abs_advs = abs_returns - abs_values
             abs_advs = (abs_advs - abs_advs.mean()) / (abs_advs.std() + 1e-8)
 
+            rnd_advs = rnd_ret - rnd_values
+            rnd_advs = (rnd_advs - rnd_advs.mean()) / (rnd_advs.std() + 1e-8)
+            # print("FUCK FUCK FUCK FUCK FUCK")
+            # print(actions.shape)
+            # print(values.shape)
+            # print(neglogpac.shape)
+            # # print(opp_obs.shape)
+            # print(opp_returns.shape)
+            # print(opp_values.shape)
+            # print(abs_returns.shape)
+            # print(abs_values.shape)
+            # print("FUCK END")
+
             if isinstance(ac_space, MaskDiscrete):
                 td_map = {train_model.X: obs[0], train_model.MASK: obs[-1], A: actions,
                           ADV: advs, R:returns, LR:lr, CLIPRANGE:cliprange,
@@ -164,13 +207,15 @@ class Adv_Model(object):
                           vtrain_model.X:opp_obs[0], vtrain_model.MASK:opp_obs[-1],
                           opp_ADV:opp_advs, opp_R:opp_returns, opp_OLDVPRED:opp_values,
                           vtrain1_model.X:opp_obs[0], vtrain1_model.MASK:opp_obs[-1],
-                          abs_ADV:abs_advs, abs_R:abs_returns, abs_OLDVPRED:abs_values}
+                          abs_ADV:abs_advs, abs_R:abs_returns, abs_OLDVPRED:abs_values,
+                          rnd_ADV:rnd_advs, rnd_R:rnd_ret, rnd_OLDVPRED: rnd_values}
             else:
                 td_map = {train_model.X:obs, A:actions, ADV:advs, R:returns, LR:lr,
                           CLIPRANGE:cliprange, OLDNEGLOGPAC:neglogpacs, OLDVPRED:values,
                           self.coef_opp_ph: coef_opp, self.coef_adv_ph: coef_adv, self.coef_abs_ph: coef_abs,
                           opp_ADV:opp_advs, opp_R:opp_returns, opp_OLDVPRED:opp_values,
-                          abs_ADV:abs_advs, abs_R:abs_returns, abs_OLDVPRED:abs_values}
+                          abs_ADV:abs_advs, abs_R:abs_returns, abs_OLDVPRED:abs_values, 
+                          rnd_ADV:rnd_advs, rnd_R:rnd_ret, rnd_OLDVPRED: rnd_values}
 
             if states is not None:
                 td_map[train_model.STATE] = states
@@ -183,6 +228,7 @@ class Adv_Model(object):
             if abs_states is not None:
                 td_map[vtrain1_model.STATE] = abs_states
                 td_map[vtrain1_model.DONE] = dones
+
 
             return sess.run([pg_loss, vf_loss, entropy, approxkl, clipfrac, _train], td_map)[:-1]
 
@@ -323,9 +369,11 @@ class PPO_AdvActor(object):
 
     def _nstep_rollout(self):
         mb_obs, mb_rewards, mb_actions, mb_values, mb_dones, mb_neglogpacs = [],[],[],[],[],[]
+        intri_rewards = []
 
         # define the opponent observation, rewards, dones
         mb_opp_obs, mb_opp_returns, mb_opp_values, mb_abs_returns, mb_abs_values = [],[],[],[],[]
+        mb_rnd_values = []
 
         mb_opp_rewards, mb_abs_rewards = [], []
 
@@ -366,18 +414,25 @@ class PPO_AdvActor(object):
                 obs_oppo = self._oppo_obs
             else:
                 obs_oppo = self._obs
-
+      
             values_oppo, self.adv_opp_states = self._model.opp_value(transform_tuple(obs_oppo,
                                                                                      lambda x: np.expand_dims(x, 0)),
                                                                      self.adv_opp_states,
                                                                      np.expand_dims(self._done, 0))
 
+            opp_rdr = values_oppo[1]
+            opp_rdf = values_oppo[2]
+            opp_rvf = values_oppo[3]
+            values_oppo = values_oppo[0]
+            intri_reward = ((opp_rdr - opp_rdf) ** 2).mean(axis = -1)
+
             values_abs, self.adv_abs_states = self._model.abs_value(transform_tuple(obs_oppo,
                        lambda x: np.expand_dims(x, 0)), self.adv_abs_states,
                        np.expand_dims(self._done, 0))
-
+            values_abs = values_abs[0] 
             mb_opp_values.append(values_oppo[0])
             mb_abs_values.append(values_abs[0])
+            mb_rnd_values.append(opp_rvf[0])
 
             (self._obs, self._oppo_obs), reward, self._done, info \
                 = self._env.step([action[0], oppo_action[0]])
@@ -418,6 +473,7 @@ class PPO_AdvActor(object):
 
             # opp, abs rewards
             mb_rewards.append(reward)
+            intri_rewards.append(intri_reward)
             mb_opp_rewards.append(oppo_reward)
             mb_abs_rewards.append((reward - oppo_reward))
 
@@ -439,6 +495,8 @@ class PPO_AdvActor(object):
         # Add abs-rewards, abs-dones
         mb_opp_rewards = np.asarray(mb_opp_rewards, dtype=np.float32)
         mb_opp_values = np.asarray(mb_opp_values, dtype=np.float32)
+        mb_rnd_values = np.asarray(mb_rnd_values, dtype=np.float32)
+        intri_rewards = np.asarray(intri_rewards, dtype=np.float32)
 
         mb_abs_rewards = np.asarray(mb_abs_rewards, dtype=np.float32)
         mb_abs_values = np.asarray(mb_abs_values, dtype=np.float32)
@@ -452,12 +510,25 @@ class PPO_AdvActor(object):
                        lambda x: np.expand_dims(x, 0)), self.adv_opp_states)
           abs_last_values, _ = self._model.abs_value(transform_tuple(self._oppo_obs,
                        lambda x: np.expand_dims(x, 0)), self.adv_abs_states)
+          opp_last_rdr = opp_last_values[1]
+          opp_last_rdf = opp_last_values[2]
+          opp_last_rvf = opp_last_values[3]
+          opp_last_values= opp_last_values[0]
+          intri_last_reward = (opp_last_rdr - opp_last_rdf) ** 2
+          abs_last_values = abs_last_values[0]
         else:
           opp_last_values, _ = self._model.opp_value(transform_tuple(self._obs,
                        lambda x: np.expand_dims(x, 0)), self.adv_opp_states)
+          opp_last_rdr = opp_last_values[1]
+          opp_last_rdf = opp_last_values[2]
+          opp_last_rvf = opp_last_values[3]
+          opp_last_values= opp_last_values[0]
+          intri_last_reward = (opp_last_rdr - opp_last_rdf) ** 2
           abs_last_values, _ = self._model.abs_value(transform_tuple(self._obs,
                        lambda x: np.expand_dims(x, 0)), self.adv_abs_states)
+          abs_last_values = abs_last_values[0]
 
+        rnd_returns = np.zeros_like(mb_rewards)
         mb_returns = np.zeros_like(mb_rewards)
         mb_advs = np.zeros_like(mb_rewards)
 
@@ -470,6 +541,11 @@ class PPO_AdvActor(object):
         last_gae_lam = 0
         opp_last_gae_lam = 0
         abs_last_gae_lam = 0
+        
+        # gae for intri reward
+        opp_last_gae_lam_intri = 0
+        mb_opp_intri_advs = np.zeros_like(mb_opp_rewards)
+        mb_opp_intri_returns = np.zeros_like(mb_opp_rewards)
 
         for t in reversed(range(self._unroll_length)):
             if t == self._unroll_length - 1:
@@ -477,11 +553,13 @@ class PPO_AdvActor(object):
                 next_values = last_values[0]
                 opp_nextvalues = opp_last_values[0]
                 abs_nextvalues = abs_last_values[0]
+                rnd_nextvalues = opp_last_rvf[0]
             else:
                 next_nonterminal = 1.0 - mb_dones[t + 1]
                 next_values = mb_values[t + 1]
                 opp_nextvalues = mb_opp_values[t + 1]
                 abs_nextvalues = mb_abs_values[t + 1]
+                rnd_nextvalues = mb_rnd_values[t + 1]
 
             delta = mb_rewards[t] + self._gamma * next_values * next_nonterminal - mb_values[t]
             mb_advs[t] = last_gae_lam = delta + self._gamma * self._lam * next_nonterminal * last_gae_lam
@@ -490,11 +568,16 @@ class PPO_AdvActor(object):
             opp_delta = mb_opp_rewards[t] + self._gamma * opp_nextvalues * next_nonterminal - mb_opp_values[t]
             mb_opp_advs[t] = opp_last_gae_lam = opp_delta + self._gamma * self._lam * \
                                                 next_nonterminal * opp_last_gae_lam
+            # opp-intri-delta
+            opp_delta_intri = intri_rewards[t] + self._gamma * rnd_nextvalues * next_nonterminal - mb_rnd_values[t]
+            mb_opp_intri_advs[t] = opp_last_gae_lam_intri = opp_delta_intri + self._gamma * self._lam * next_nonterminal * opp_last_gae_lam_intri
+ 
             # abs-delta
             abs_delta = mb_abs_rewards[t] + self._gamma * abs_nextvalues * next_nonterminal - mb_abs_values[t]
             mb_abs_advs[t] = abs_last_gae_lam = abs_delta + self._gamma * self._lam * \
                                                 next_nonterminal * abs_last_gae_lam
 
+        mb_opp_intri_returns = mb_opp_intri_advs + mb_rnd_values
         mb_returns = mb_advs + mb_values
         mb_opp_returns = mb_opp_advs + mb_opp_values
         mb_abs_returns = mb_abs_advs + mb_abs_values
@@ -503,7 +586,7 @@ class PPO_AdvActor(object):
         # opp_obs, opp_returns, opp_values, abs_returns, abs_values
         # states = None, opp_states = None, abs_states = None
         return (mb_obs, mb_opp_obs, mb_returns, mb_dones, mb_actions, mb_values, mb_neglogpacs,
-                mb_opp_returns, mb_opp_values, mb_abs_returns, mb_abs_values,
+                mb_opp_returns, mb_opp_values, mb_abs_returns, mb_abs_values, mb_opp_intri_returns, mb_rnd_values,
                 mb_states, mb_adv_opp_states, mb_adv_abs_states, episode_infos)
 
     def _push_data(self, zmq_context, learner_ip, port_B, data_queue):
@@ -573,6 +656,7 @@ class Adv_Learner(object):
     assert self._unroll_length % self._unroll_split == 0
     self._data_queue = deque(maxlen=queue_size * self._unroll_split)
     self._data_timesteps = deque(maxlen=200)
+    # print(max_episode)
     self._episode_infos = deque(maxlen=max_episode)
     self._num_unrolls = 0
 
@@ -641,15 +725,16 @@ class Adv_Learner(object):
       clip_range_now = self._clip_range(updates)
 
       batch = batch_queue.get()
-
+      # print("<<<<<<<<<<<<<<<<<< trainning <<<<<<<<<<<<<<<<<< \n")
+      # for c in batch:
+      #   print(c.shape)
       obs, returns, dones, actions, values, neglogpacs, \
       opp_obs, opp_returns, opp_values, abs_returns, abs_values, \
-      states, opp_states, abs_states = batch
-
+      states, opp_states, abs_states, rnd_returns, rnd_values = batch
       loss.append(self._model.train(lr_now, clip_range_now, coef_opp_now, coef_adv_now, coef_abs_now,
                                     obs, returns, dones, actions, values, neglogpacs, opp_obs,
                                     opp_returns, opp_values, abs_returns, abs_values,
-                                    states, opp_states, abs_states))
+                                    states, opp_states, abs_states, rnd_returns, rnd_values))
 
       self._model_params = self._model.read_params()
 
@@ -698,7 +783,7 @@ class Adv_Learner(object):
       batch = random.sample(data_queue, batch_size)
 
       obs, opp_obs, returns, dones, actions, values, neglogpacs, \
-      opp_returns, opp_values, abs_returns, abs_values, \
+      opp_returns, opp_values, abs_returns, abs_values, rnd_returns, rnd_values, \
       states, opp_states, abs_states = zip(*batch)
 
       if isinstance(obs[0], tuple):
@@ -721,11 +806,14 @@ class Adv_Learner(object):
       opp_values = np.concatenate(opp_values)
       abs_returns = np.concatenate(abs_returns)
       abs_values = np.concatenate(abs_values)
+      rnd_returns = np.concatenate(rnd_returns)
+      rnd_values = np.concatenate(rnd_values)
+      # rnd_advs = np.concatenate(rnd_advs)
 
       # batch queue
       batch_queue.put((obs, returns, dones, actions, values, neglogpacs,
                        opp_obs, opp_returns, opp_values, abs_returns,
-                       abs_values, states, opp_states, abs_states))
+                       abs_values, states, opp_states, abs_states, rnd_returns, rnd_values))
 
   def _pull_data(self, zmq_context, data_queue, episode_infos, unroll_split,
                  port_B):
@@ -735,6 +823,7 @@ class Adv_Learner(object):
     receiver.bind("tcp://*:%s" % port_B)
     while True:
       data = receiver.recv_pyobj()
+      # print(len(data))
       if unroll_split > 1:
         # Added by Xian
         data_queue.extend(list(zip(*(

@@ -39,8 +39,15 @@ def plot_graph(cluster_ids_path, output_dir):
     data = np.load(cluster_ids_path)
     # plot the graph
     fig, ax = plt.subplots(figsize=(3.2, 3.2))
+#    print(data.shape)
+    new_data = []
+    for i in range(data.shape[0]):
+        if i % 2 == 0:
+            new_data.append(data[i,:])
+#    print(np.array(new_data).shape)
+    data = np.array(new_data)
 
-    colors = {"Our": "orangered", "Zoo": '#2ca02c', "Ucb": "blue"}
+    colors = {"Our": "red", "Zoo": 'yellow', "Ucb": "blue"}
     len = int(data.shape[0] / 3)
 
     opponent_type = ['Zoo'] * len + ['Our'] * len + ['Ucb'] * len
@@ -58,21 +65,22 @@ def plot_graph(cluster_ids_path, output_dir):
     ax.yaxis.set_major_locator(matplotlib.ticker.NullLocator())
     ax.margins(x=0.01, y=0.01)
     ax.scatter(data[:, 0], data[:, 1], c=hues, alpha=0.75, s=0.25, edgecolors="none", linewidth=1)
+#    ax.scatter(new_data[:, 0], new_data[:, 1], c=hues, alpha=0.75, s=0.25, edgecolors="none", linewidth=1)
     fig.savefig(output_dir + '/' + output_dir.split('/')[-1] + '.pdf')
 
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--dir", type=str, default='../activations/tsne/YouShallNotPassHumans')
-    parser.add_argument("--output_dir", type=str, default='../activations/tsne/YouShallNotPassHumans')
+    parser.add_argument("--dir", type=str, default='./results/activates')
+    parser.add_argument("--output_dir", type=str, default='./results/outs')
 
     args = parser.parse_args()
 
-    activation_paths = {}
-    activation_paths['norm'] = args.dir + '/activations_norm.npy'
-    activation_paths['our'] = args.dir + '/activations_our_adv.npy'
-    activation_paths['ucb'] = args.dir + '/activations_ucb_adv.npy'
+    #activation_paths = {}
+    #activation_paths['norm'] = args.dir + '/activations_both_normal.npy'
+    #activation_paths['our'] = args.dir + '/activations_our_adv.npy'
+    #activation_paths['ucb'] = args.dir + '/activations_baseline.npy'
 
-    fit_tsne(activation_paths, args.output_dir)
-    cluster_ids_path = args.dir + '/cluster_ids.npy'
+    #fit_tsne(activation_paths, args.output_dir)
+    cluster_ids_path = args.output_dir + '/cluster_ids.npy'
     plot_graph(cluster_ids_path, args.output_dir)

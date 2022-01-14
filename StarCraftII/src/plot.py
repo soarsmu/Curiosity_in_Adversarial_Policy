@@ -9,16 +9,17 @@ def read_events_file(events_filename):
     folders = os.listdir(events_filename)
     events = []
     for folder in folders:
-        if os.path.exists(os.path.join(events_filename, folder+'/'+'Log.txt')):
-            event = pd.read_csv(os.path.join(events_filename, folder+'/'+'Log.txt'), sep=' ', names=['step', 'win'],
+        if os.path.exists(folder+'/'+'Log.txt'):
+            event = pd.read_csv(folder+'/'+'Log.txt', sep=' ', names=['step', 'win'],
                                 index_col=0)
+            print(event)
             if 'baseline' in events_filename:
                 import numpy as np
                 np.random.seed(123)
                 event = event * ((2) - np.random.normal(0.05, 0.1, 1))
 
             events.append(event[0:1049])
-    data_form = pd.concat(events)
+    #data_form = pd.concat(events)
     data_form = data_form.sort_index()
     data_form = data_form.reset_index()
     data_form = data_form.groupby('step')['win']
@@ -64,8 +65,8 @@ def plot_data(log_dir, out_dir, filename):
 # main function
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--log_dir', type=str, default='/Desktop/rl_newloss/StarCraftII/StarCraft-results/agents')
-    parser.add_argument("--out_dir", type=str, default='/Desktop/rl_newloss/StarCraftII/StarCraft-results/results')
+    parser.add_argument('--log_dir', type=str, default='/Users/Henryguo/Desktop/rl_newloss/StarCraftII/StarCraft-results/agents')
+    parser.add_argument("--out_dir", type=str, default='/Users/Henryguo/Desktop/rl_newloss/StarCraftII/StarCraft-results/results')
     parser.add_argument("--filename", type=str, default='results.png')
     args = parser.parse_args()
 
