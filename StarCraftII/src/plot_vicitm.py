@@ -57,8 +57,8 @@ def plot_data(log_dir, out_dir, filename):
 # main function
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--log_dir', type=str, default='/Users/Henryguo/Desktop/rl_newloss/StarCraftII/StarCraft-results/retrain_50/our_attack')
-    parser.add_argument('--out_dir', type=str, default='/Users/Henryguo/Desktop/rl_newloss/StarCraftII/StarCraft-results/retrain_50/our_attack')
+    parser.add_argument('--log_dir', type=str, default='/Desktop/rl_newloss/StarCraftII/StarCraft-results/retrain_50/our_attack')
+    parser.add_argument('--out_dir', type=str, default='/Desktop/rl_newloss/StarCraftII/StarCraft-results/retrain_50/our_attack')
     parser.add_argument("--filename", type=str, default='results.png')
     args = parser.parse_args()
 
