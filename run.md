@@ -20,8 +20,8 @@ XXX
 
 ## Evaluation
 
-- Playing the adversarial agent with a regular victim agent: ``` python test_masked_victim.py --env <env_id> --opp_path <path-of-the-opponent-agent> --norm_path <path-of-the-opponent-observation-normalization> --vic_path <path-of-the-victim-agent> --vic_mask <False> ```.
-- Playing the adversarial agent with a masked victim agent: ``` python test_masked_victim.py --env <env_id> --opp_path <path-to-the-opponent-agent> --norm_path <path-to-the-opponent-observation-normalization> --vic_path <path-to-the-victim-agent> --vic_mask <True> ```.
+- Playing the adversarial agent with a regular victim agent: ``` python test_masked_victim.py --env <env_id> --opp_path <path-of-the-opponent-agent> --norm_path <path-of-the-opponent-observation-normalization> --vic_path <path-of-the-victim-agent> --vic_mask False --is_rnd True```.
+- Playing the adversarial agent with a masked victim agent: ``` python test_masked_victim.py --env <env_id> --opp_path <path-to-the-opponent-agent> --norm_path <path-to-the-opponent-observation-normalization> --vic_path <path-to-the-victim-agent> --vic_mask True --is_rnd True```.
 
 ## Visualizing the winning and non-loss rate of the adversarial agents/retrained victim agents:
 Visualizing the winning and non-loss rate of the adversarial agents:
