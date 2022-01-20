@@ -14,7 +14,7 @@ XXX
 
 ## Retraining of Victim Agents:
 
-- We put the adversarial model used for the retraining in the ```../our agent/attack/``` folder. The weights of policy network is named as ```model.pkl```, the mean and variance of the observation normalization as ```obs_rms.pkl```.
+- We put the adversarial model used for the retraining in the ```../our agent/attack/``` folder. The weights of the policy network are named as ```model.pkl```, the mean and variance of the observation normalization as ```obs_rms.pkl```.
 - Run the ```python victim_train.py --env <env_id> --vic_agt_id <vic_agt_id> --adv_path <path-to-trained-advesaries-model> --adv_obs_normpath <path-to-trained-adversaries-observation-normalization> --vic_coef_init 1 --adv_coef_init -1 --is_rnd Ture ```. It is noticed that the choice of 'vic_agt_id' should be kept the same with that in ```adv_train.py```.
 - After training, the trained model and tensorboard logs are saved into the fold ``` ../victim-agent-zoo/XXX ```, where XXX is the name of environments.
 
