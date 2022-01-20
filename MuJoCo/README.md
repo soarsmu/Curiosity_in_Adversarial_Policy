@@ -1,11 +1,10 @@
-# MuJoCo Games
-
 ## Install MuJoCo Environment
 
 XXX
 
 ## Training Curiosity-Driven and Victim-Aware Adversarial Policies
 
+写清楚到哪个文件夹下啊
 - Our attack: Run the ``` python adv_train.py --env <env_id> --vic_agt_id <vic_agt_id> --explore <explore> --algorithm rnd_policy```.
 - Baseline attack: ``` python adv_train.py --env <env_id> --vic_agt_id <vic_agt_id> --algorithm regular```.
 - 'env' specifies the game environment, 'vic_agt_id' specifies the victim policy under attacking (The exact choices for each game are shown in ```adv_train.py```). ```adv_train.py``` also gives the descriptions and default values for other hyper-parameters.
