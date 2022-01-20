@@ -2,9 +2,10 @@
 
 XXX
 
+All the python files are released in the fold ```src```.
+
 ## Training Curiosity-Driven and Victim-Aware Adversarial Policies
 
-写清楚到哪个文件夹下啊
 - Our attack: Run the ``` python adv_train.py --env <env_id> --vic_agt_id <vic_agt_id> --explore <explore> --algorithm rnd_policy```.
 - Baseline attack: ``` python adv_train.py --env <env_id> --vic_agt_id <vic_agt_id> --algorithm regular```.
 - 'env' specifies the game environment, 'vic_agt_id' specifies the victim policy under attacking (The exact choices for each game are shown in ```adv_train.py```). ```adv_train.py``` also gives the descriptions and default values for other hyper-parameters.
@@ -24,11 +25,11 @@ XXX
 
 ## Visualizing the winning and non-loss rate of the adversarial agents/retrained victim agents:
 Visualizing the winning and non-loss rate of the adversarial agents:
-- Run ``` python calnon_loss.py``` in ```./rnd_result``` fold to obtain the non-loss rates of adversarial agents.
+- Run ``` python calnon_loss.py``` in ```../rnd_result``` fold to obtain the non-loss rates of adversarial agents.
 - Run ```python plot2.py```.
 
 Visualizing the winning and non-loss rate of the retrained victim agents:
-- Run ``` python calnon_loss.py``` in ```./rnd_result/retrain_win``` fold to obtain the non-loss rates of the retrained victim agents.
+- Run ``` python calnon_loss.py``` in ```../rnd_result/retrain_win``` fold to obtain the non-loss rates of the retrained victim agents.
 - Run ```python retrain_plot.py```.
 
 ## Visualizing the t-SNE:
