@@ -1,9 +1,22 @@
-# Curiosity-Driven and Victim-Aware Adversarial Policies
+## Intro
 
-This repo contains the codes for the paper "Curiosity-Driven and Victim-Aware Adversarial Policies".
+This is the codebase for 'Curiosity-Driven and Victim-Aware Adversarial Policies'. Our paper ......
 
-## Code instructions
+## Project structure
 
-The detailed code instructions are presented in ```run.md```.
+The structure of this project is as follows：
+```
+MuJoCo ----------------------------------- for xxxxxx
+    -- xxxx
+        -- xxxx.py ----------------------------- xxxx
+        
+```
 
+## How to run
 
+⚠️ The commands for running each code scripts and replicate our experiments can be found in `README.md` under each subfolder. 
+
+⚠️ Please use a docker container with `xxxx`, i.e.,
+```
+docker pull xxxxxx
+```
