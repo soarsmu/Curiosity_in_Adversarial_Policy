@@ -1,6 +1,3 @@
-## Install MuJoCo Environment
-
-XXX
 
 All the python files are released in the fold ```src```.
 
