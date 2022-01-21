@@ -1,7 +1,7 @@
 
 # MuJoCo Games
 
-All the python files are released in the fold ```src```.
+All the code files you need to replicate our experiments are released in the fold ```src```.
 
 ## Training Curiosity-Driven and Victim-Aware Adversarial Policies:
 
