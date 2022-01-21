@@ -6,9 +6,9 @@ This is the codebase for 'Curiosity-Driven and Victim-Aware Adversarial Policies
 
 The structure of this project is as follows：
 ```
-MuJoCo ----------------------------------- for xxxxxx
-    -- xxxx
-        -- xxxx.py ----------------------------- xxxx
+MuJoCo
+    -- src
+        -- adv_train.py ------------------ train the adversarial policy.
         
 ```
 
