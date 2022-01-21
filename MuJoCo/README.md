@@ -3,7 +3,7 @@
 
 All the python files are released in the fold ```src```.
 
-## Training Curiosity-Driven and Victim-Aware Adversarial Policies
+## Training Curiosity-Driven and Victim-Aware Adversarial Policies:
 
 - Our attack: Run the ``` python adv_train.py --env <env_id> --vic_agt_id <vic_agt_id> --explore <explore> --algorithm rnd_policy```.
 - Baseline attack: ``` python adv_train.py --env <env_id> --vic_agt_id <vic_agt_id> --algorithm regular```.
@@ -17,7 +17,7 @@ All the python files are released in the fold ```src```.
 - Run the ```python victim_train.py --env <env_id> --vic_agt_id <vic_agt_id> --adv_path <path-of-advesaries-model> --adv_obs_normpath <path-of-adversaries-observation-normalization> --is_rnd Ture ```. It is noticed that the choice of 'vic_agt_id' should be consistent with that in adversarial training.
 - After training, the trained models and tensorboard logs are saved into the fold ``` ../victim-agent-zoo/XXX ```, where XXX is the name of environments.
 
-## Evaluation
+## Evaluation:
 
 - Playing the adversarial agent with a regular victim agent: ``` python test_masked_victim.py --env <env_id> --opp_path <path-of-the-opponent-agent> --norm_path <path-of-the-opponent-observation-normalization> --vic_path <path-of-the-victim-agent> --vic_mask False --is_rnd True```.
 - Playing the adversarial agent with a masked victim agent: ``` python test_masked_victim.py --env <env_id> --opp_path <path-to-the-opponent-agent> --norm_path <path-to-the-opponent-observation-normalization> --vic_path <path-to-the-victim-agent> --vic_mask True --is_rnd True```.
