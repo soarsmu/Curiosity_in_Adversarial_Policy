@@ -1,21 +1,21 @@
 
 # MuJoCo Games
 
-All the code files you need to replicate our experiments are released in the fold ```src```.
+All the code files you need to replicate our experiments are released in the folder ```src```.
 
 ## Training Curiosity-Driven and Victim-Aware Adversarial Policies:
 
 - Our attack: Run the ``` python adv_train.py --env <env_id> --vic_agt_id <vic_agt_id> --explore <explore> --algorithm rnd_policy```.
 - Baseline attack: ``` python adv_train.py --env <env_id> --vic_agt_id <vic_agt_id> --algorithm regular```.
 - 'env' specifies the game environment, 'vic_agt_id' specifies the victim policy under attacking (The exact choices for each game are shown in ```adv_train.py```). ```adv_train.py``` also gives the descriptions and default values for other hyper-parameters.
-- After training, the trained models and tensorboard logs are saved into the fold ``` ../agent-zoo/XXX ```, where XXX is the name of environments.
-- Visualization of tensorboard logs: ``` tensorboard --logdir=XXX ```, where XXX is the fold of tensorboard logs.
+- After training, the trained models and tensorboard logs are saved into the folder ``` ../agent-zoo/XXX ```, where XXX is the name of environments.
+- Visualization of tensorboard logs: ``` tensorboard --logdir=XXX ```, where XXX is the folder of tensorboard logs.
 
 ## Retraining of Victim Agents:
 
 - The adversarial model used for the retraining experiments in the ```../our agent/attack/``` folder. The weights of the adversarial policy networks are named as ```model.pkl```, and the mean and variance of the observation normalization is named as ```obs_rms.pkl```.
 - Run the ```python victim_train.py --env <env_id> --vic_agt_id <vic_agt_id> --adv_path <path-of-advesaries-model> --adv_obs_normpath <path-of-adversaries-observation-normalization> --is_rnd Ture ```. It is noticed that the choice of 'vic_agt_id' should be consistent with that in adversarial training.
-- After training, the trained models and tensorboard logs are saved into the fold ``` ../victim-agent-zoo/XXX ```, where XXX is the name of environments.
+- After training, the trained models and tensorboard logs are saved into the folder ``` ../victim-agent-zoo/XXX ```, where XXX is the name of environments.
 
 ## Evaluation:
 
@@ -24,11 +24,11 @@ All the code files you need to replicate our experiments are released in the fol
 
 ## Visualizing the winning and non-loss rate of the adversarial agents/retrained victim agents:
 Visualizing the winning and non-loss rate of the adversarial agents:
-- Run ``` python calnon_loss.py``` in ```../rnd_result``` fold to obtain the non-loss rates of adversarial agents.
+- Run ``` python calnon_loss.py``` in ```../rnd_result``` folder to obtain the non-loss rates of adversarial agents.
 - Run ```python plot2.py```.
 
 Visualizing the winning and non-loss rate of the retrained victim agents:
-- Run ``` python calnon_loss.py``` in ```../rnd_result/retrain_win``` fold to obtain the non-loss rates of the retrained victim agents.
+- Run ``` python calnon_loss.py``` in ```../rnd_result/retrain_win``` folder to obtain the non-loss rates of the retrained victim agents.
 - Run ```python retrain_plot.py```.
 
 ## Visualizing the t-SNE:
