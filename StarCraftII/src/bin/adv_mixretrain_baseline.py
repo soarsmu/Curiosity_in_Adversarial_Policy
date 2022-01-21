@@ -49,8 +49,8 @@ flags.DEFINE_boolean("use_action_mask", True, "Use region-wise combat.")
 flags.DEFINE_string("reward_shaping_type", "None", "type of reward shaping.")
 
 # opponent model related hyperparameters.
-flags.DEFINE_string("opp_model_path", '../model/retrain_model/checkpoint-1200000', "Opponent Model Path")
-flags.DEFINE_string("norm_model_path", '../model/retrain_model/checkpoint-1200000', "Norm Model Path")
+flags.DEFINE_string("opp_model_path", '../model/baseline_model/checkpoint-1200000', "Opponent Model Path")
+flags.DEFINE_string("norm_model_path", '../model/baseline_model/checkpoint-1200000', "Norm Model Path")
 flags.DEFINE_float("mix_ratio", 0.5, "ratio of playing with adv-agent")
 flags.DEFINE_boolean("use_victim_ob", False, "whether use victim obs")
 
