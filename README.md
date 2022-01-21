@@ -24,4 +24,4 @@ docker pull xxxxxx
 ```
 pip install -r requirments.txt
 ```
-in fold ```StarCraftII``` to install the required packages.
+in fold ```StarCraftII``` to install the required packages. It is noticed that the version of StarCraftII is SC2 4.6.2 (B69232).
