@@ -16,7 +16,12 @@ MuJoCo ----------------------------------- for xxxxxx
 
 ⚠️ The commands for running each code scripts and replicate our experiments can be found in `README.md` under each subfolder. 
 
-⚠️ Please use a docker container with `xxxx`, i.e.,
+⚠️ For the MuJoCo games, please use a docker container with `xxxx`, i.e.,
 ```
 docker pull xxxxxx
 ```
+⚠️ For the StarCraft games, please pull and install the repo from: https://github.com/Tencent/PySC2TencentExtension. Then, run 
+```
+pip install -r requirments.txt
+```
+in fold ```StarCraftII``` to install the required packages.
