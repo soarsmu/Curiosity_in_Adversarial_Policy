@@ -76,11 +76,11 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    #activation_paths = {}
-    #activation_paths['norm'] = args.dir + '/activations_both_normal.npy'
-    #activation_paths['our'] = args.dir + '/activations_our_adv.npy'
-    #activation_paths['ucb'] = args.dir + '/activations_baseline.npy'
+    activation_paths = {}
+    activation_paths['norm'] = args.dir + '/activations_both_normal.npy'
+    activation_paths['our'] = args.dir + '/activations_our_adv.npy'
+    activation_paths['ucb'] = args.dir + '/activations_baseline.npy'
 
-    #fit_tsne(activation_paths, args.output_dir)
+    fit_tsne(activation_paths, args.output_dir)
     cluster_ids_path = args.output_dir + '/cluster_ids.npy'
     plot_graph(cluster_ids_path, args.output_dir)
