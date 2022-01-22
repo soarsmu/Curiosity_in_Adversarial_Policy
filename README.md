@@ -9,7 +9,7 @@ The structure of this project is as follows：
 MuJoCo
     -- src
         -- adv_train.py ------------------ train the adversarial agents.
-        -- victim_train.py ------------------ train the adversarial policy.
+        -- victim_train.py ------------------ retrain the victim agents.
         -- adv_train.py ------------------ train the adversarial policy.
         -- adv_train.py ------------------ train the adversarial policy.
         -- adv_train.py ------------------ train the adversarial policy.
