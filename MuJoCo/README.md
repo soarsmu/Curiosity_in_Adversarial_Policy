@@ -1,19 +1,41 @@
 
 # MuJoCo Games
 
-All the code files you need to replicate our experiments are released in the folder ```src```.
+All the code files you need to replicate our experiments are released in the folder `src`.
+
+For configuration, please run:
+```
+pip install -r requirments.txt
+```
 
 ## Training Curiosity-Driven and Victim-Aware Adversarial Policies:
 
-- Our attack: Run the ``` python adv_train.py --env <env_id> --vic_agt_id <vic_agt_id> --explore <explore> --algorithm rnd_policy```.
-- Baseline attack: ``` python adv_train.py --env <env_id> --vic_agt_id <vic_agt_id> --algorithm regular```.
-- 'env' specifies the game environment, 'vic_agt_id' specifies the victim policy under attacking (The exact choices for each game are shown in ```adv_train.py```). ```adv_train.py``` also gives the descriptions and default values for other hyper-parameters.
-- After training, the trained models and tensorboard logs are saved into the folder ``` ../agent-zoo/XXX ```, where XXX is the name of environments.
-- Visualization of tensorboard logs: ``` tensorboard --logdir=XXX ```, where XXX is the folder of tensorboard logs.
+- Our attack: please run 
+```
+cd src
+python adv_train.py --env <env_id> --vic_agt_id <vic_agt_id> --explore <explore> --algorithm rnd_policy
+```
+- Baseline attack: please run
+```
+python adv_train.py --env <env_id> --vic_agt_id <vic_agt_id> --algorithm regular
+```
+In the above scripts, `<env_id>` specifies the game environment, the options are as follows:
+| env_id | Environment |
+| ------ | ----------- |
+| 0      |  RunToGoalAnts-v0           |
+| 1      |  RunToGoalHumans-v0           |
+| 2      |  YouShallNotPassHumans-v0           |
+| 3      |  KickAndDefend-v0           |
+| 4      | SumoAnts-v0            |
+| 5      |  SumoHumans-v0           |
+
+`<vic_agt_id>` specifies the victim policy under attacking (The exact choices for each game are shown in ```adv_train.py```). ```adv_train.py``` also gives the descriptions and default values for other hyper-parameters.
+ 
+After training, the trained models and tensorboard logs are saved into the folder `../agent-zoo/<env_id>`.
 
 ## Retraining of Victim Agents:
 
-- The adversarial model used for the retraining experiments in the ```../our agent/attack/``` folder. The weights of the adversarial policy networks are named as ```model.pkl```, and the mean and variance of the observation normalization is named as ```obs_rms.pkl```.
+The adversarial model used for the retraining experiments in the `../our agent/attack/` folder. The weights of the adversarial policy networks are named as ```model.pkl```, and the mean and variance of the observation normalization is named as ```obs_rms.pkl```.
 - Run the ```python victim_train.py --env <env_id> --vic_agt_id <vic_agt_id> --adv_path <path-of-advesaries-model> --adv_obs_normpath <path-of-adversaries-observation-normalization> --is_rnd Ture ```. It is noticed that the choice of 'vic_agt_id' should be consistent with that in adversarial training.
 - After training, the trained models and tensorboard logs are saved into the folder ``` ../victim-agent-zoo/XXX ```, where XXX is the name of environments.
 
