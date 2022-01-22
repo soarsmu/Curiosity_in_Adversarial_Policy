@@ -44,4 +44,4 @@ StarCraft II
 
 ## How to run
 
-⚠️ The commands for running each code scripts and replicate our experiments can be found in `README.md` under each subfolder. 
+⚠️ The configurations and scripts for replicating our experiments can be found in `README.md` under each subfolder. 
