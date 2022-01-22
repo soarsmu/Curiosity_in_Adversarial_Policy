@@ -2,6 +2,12 @@
 
 All the code files you need to replicate our experiments are released in the folder ```src```.
 
+⚠️ Please pull and install the repo from: https://github.com/Tencent/PySC2TencentExtension. Then, run 
+```
+pip install -r requirments.txt
+```
+in fold ```StarCraftII``` to install the required packages. It is noticed that the version of StarCraftII is SC2 4.6.2 (B69232).
+
 ## Training Curiosity-Driven and Victim-Aware Adversarial Policies:
 
 - Our attack: run ```python -m bin.advtrain_ppo --job_name learner --init_model_path '../normal-agent/checkpoint-100000' --save_dir <path-to-a-folder>``` to start the learner. Then run 
