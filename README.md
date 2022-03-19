@@ -23,7 +23,7 @@ MuJoCo
         -- retrained --------------------- the policy network weights of retrained victim agents.
     -- adv-agent
         -- baseline ---------------------- the policy network weights of adversarial agents trained by baseline approach.
-    -- video ------------------ the game videos show adversarial policies aginst with victim agent.
+    -- video ------------------ the game videos show adversarial policies and regular agents aginst with victim agents, respectively.
         
 StarCraft II
     -- src
