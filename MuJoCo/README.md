@@ -1,21 +1,37 @@
 
-# MuJoCo Tasks
+# MuJoCo Games
 
-## Training Clean agents:
+All the code files you need to replicate our experiments are released in the folder `src`.
 
-- Please run 
+For configuration, please run:
+```
+pip install -r requirments.txt
+```
+
+## Training Curiosity-Driven and Victim-Aware Adversarial Policies:
+
+- Our attack: please run 
 ```
 cd src
-python mujoco_cql.py --dataset <dataset_name> --seed <seed> --gpu <gpu_id>
+python adv_train.py --env <env_id> --vic_agt_id <vic_agt_id> --explore <explore> --algorithm rnd_policy
 ```
-In the above scripts, `<dataset_name>` specifies the dataset name, the options are as follows:
-| tasks | dataset name |
+- Baseline attack: please run
+```
+python adv_train.py --env <env_id> --vic_agt_id <vic_agt_id> --algorithm regular
+```
+In the above scripts, `<env_id>` specifies the game environment, the options are as follows:
+| env_id | env |
 | ------ | ----------- |
-| Hopper      |  hopper-medium-expert-v0           |
-| Half-Cheetah      |  halfcheetah-medium-v0           |
-| Walker2D      |  walker2d-medium-v0           |
+| 0      |  RunToGoalAnts-v0           |
+| 1      |  RunToGoalHumans-v0           |
+| 2      |  YouShallNotPassHumans-v0           |
+| 3      |  KickAndDefend-v0           |
+| 4      | SumoAnts-v0            |
+| 5      |  SumoHumans-v0           |
+
+`<vic_agt_id>` specifies the victim policy under attacking (The exact choices for each game are shown in ```adv_train.py```). ```adv_train.py``` also gives the descriptions and default values for other hyper-parameters.
  
-After training, the trained models are saved into the folder `../<dataset_name>`.
+After training, the trained models and tensorboard logs are saved into the folder `../agent-zoo/<env>`, where `<env>` is the name of environments corresponding to the `<env_id>`.
 
 ## Retraining of Victim Agents:
 
@@ -69,6 +85,5 @@ To generate the results of t-SNE visualization:
 ```
 python plot_tsne.py --dir <path-to-victim-activations> --output_dir <output-folder>
 ```
-
 
 
