@@ -23,6 +23,7 @@ MuJoCo
         -- retrained --------------------- the policy network weights of retrained victim agents.
     -- adv-agent
         -- baseline ---------------------- the policy network weights of adversarial agents trained by baseline approach.
+    -- tensorboard_records ------------------ the curves recorded during training adversarial policies.  
     -- video ------------------ the game videos show adversarial policies and regular agents aginst with victim agents, respectively.
         
 StarCraft II
@@ -40,6 +41,7 @@ StarCraft II
             -- our_attack_model ---------- the policy network weights of adversarial agents using our approach.
             -- retrain_model ------------- the policy network weights of retrained victim agents.
     -- normal-agent ---------------------- the initial parameters of adversarial agents.
+    -- training_records ---------------------- the training logs recorded during training adversarial policies.
             
 ```
 
