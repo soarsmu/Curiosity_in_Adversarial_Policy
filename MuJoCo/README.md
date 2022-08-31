@@ -3,12 +3,11 @@
 
 All the code files you need to replicate our experiments are released in the folder `src`.
 
-## Environment Installation
+## Environment Installation (for conda)
 
-For configuration, please run:
-```
-pip install -r requirments.txt
-```
+* Create a virtual evironments: `conda create -n mujoco python==3.6` (python 3.7 also works)
+* Activate this environment: 
+
 
 ## Training Curiosity-Driven and Victim-Aware Adversarial Policies:
 
