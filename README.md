@@ -50,4 +50,4 @@ StarCraft II
 
 ## Acknowledgement
 
-- The codes for training the adversarial policies are based on the [Adversarial Policy](https://github.com/psuwuxian/rl_adv_valuediff).
+- The codes for training the adversarial policies are based on the [Adversarial Policy](https://github.com/psuwuxian/rl_adv_valuediff) and [Stable-Baselines](https://github.com/hill-a/stable-baselines).
