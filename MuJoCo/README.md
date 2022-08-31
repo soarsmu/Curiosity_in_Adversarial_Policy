@@ -14,6 +14,7 @@ All the code files you need to replicate our experiments are released in the fol
 * Move `gym_compete.zip` in this folder into `anaconda3/envs/mujoco/lib/python3.X/site-packages/`
 * Run `unzip gym_compete.zip`. After that You will find two folders `gym_compete` and `gym_compete-0.0.1.dist-info` in `anaconda3/envs/mujoco/lib/python3.X/site-packages/`.
 
+It is noticed that the version of Mujoco is 1.3.1.
 
 ## Training Curiosity-Driven and Victim-Aware Adversarial Policies:
 
