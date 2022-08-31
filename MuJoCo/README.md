@@ -3,6 +3,8 @@
 
 All the code files you need to replicate our experiments are released in the folder `src`.
 
+## Environment Installation
+
 For configuration, please run:
 ```
 pip install -r requirments.txt
