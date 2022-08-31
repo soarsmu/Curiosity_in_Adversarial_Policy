@@ -48,6 +48,6 @@ StarCraft II
 ⚠️ The configurations and scripts for replicating our experiments can be found in `README.md` under each subfolder. 
 
 
+## Acknowledgement
 
-
-
+- The codes for training the adversarial policies are based on the [Adversarial Policy](https://github.com/psuwuxian/rl_adv_valuediff).
