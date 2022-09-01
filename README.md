@@ -51,7 +51,7 @@ StarCraft II
 
 ## Contact
 
-⚠️ If you have any problems, please feel free to contact Chen Gong (ChenG_abc@outlook.com), Zhou Yang (zyang@smu.edu.sg), or Yunpeng Bai (baiyunpeng2020@ia.ac.cn).
+- If you have any problems, please feel free to contact Chen Gong (ChenG_abc@outlook.com), Zhou Yang (zyang@smu.edu.sg), or Yunpeng Bai (baiyunpeng2020@ia.ac.cn).
 
 ## Acknowledgement
 
