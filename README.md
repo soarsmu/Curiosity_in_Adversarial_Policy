@@ -49,6 +49,9 @@ StarCraft II
 
 ⚠️ The configurations and scripts for replicating our experiments can be found in `README.md` under each subfolder. 
 
+## Contact
+
+⚠️ If you have any problems, please feel free to contact Chen Gong (ChenG_abc@outlook.com), Zhou Yang (zyang@smu.edu.sg), or Yunpeng Bai (baiyunpeng2020@ia.ac.cn).
 
 ## Acknowledgement
 
