@@ -100,18 +100,25 @@ VIC_AGT_ID = args.vic_agt_id
 # 1: linear
 
 ## runtogoalants or youshall
-# REW_SHAPE_PARAMS = {'weights': {'dense': {'reward_move': 0.5, 'reward_contact': 1, 'reward_survive': 0.5,},
-#                                 'sparse': {'reward_remaining': 0.01}},
-#                    'anneal_frac': 0.01, 'anneal_type': 0}
+if args.env == 0 or args.env == 2:
+    REW_SHAPE_PARAMS = {'weights': {'dense': {'reward_move': 0.5, 'reward_contact': 1, 'reward_survive': 0.5,},
+                                'sparse': {'reward_remaining': 0.01}},
+                       'anneal_frac': 0.01, 'anneal_type': 0}
 
 ## sumoants
-# REW_SHAPE_PARAMS = {'weights': {'dense': {'reward_move': 1}, 'sparse': {'reward_remaining': 0.01}},
-#                     'anneal_frac': 0.1}
+elif args.env == 4:
+    REW_SHAPE_PARAMS = {'weights': {'dense': {'reward_move': 1}, 'sparse': {'reward_remaining': 0.01}},
+                        'anneal_frac': 0.1}
 
 
 # sumohuman and you shall not pass
-REW_SHAPE_PARAMS = {'weights': {'dense': {'reward_move': 0.1}, 'sparse': {'reward_remaining': 0.01}},
-                   'anneal_frac': 0}
+elif args.env == 5 or args.env == 3:
+    REW_SHAPE_PARAMS = {'weights': {'dense': {'reward_move': 0.1}, 'sparse': {'reward_remaining': 0.01}},
+                       'anneal_frac': 0}
+
+
+
+
 
 # reward discount factor
 GAMMA = 0.99
@@ -201,7 +208,21 @@ def Adv_train(env, total_timesteps, checkpoint_interval, log_interval, callback_
 
     model.learn(total_timesteps=total_timesteps, log_interval=1, callback=callback, seed=seed,
                 use_victim_ob=use_victim_ob)
+    
+    
+## runtogoalants or youshall
+# REW_SHAPE_PARAMS = {'weights': {'dense': {'reward_move': 0.5, 'reward_contact': 1, 'reward_survive': 0.5,},
+#                                 'sparse': {'reward_remaining': 0.01}},
+#                    'anneal_frac': 0.01, 'anneal_type': 0}
 
+## sumoants
+# REW_SHAPE_PARAMS = {'weights': {'dense': {'reward_move': 1}, 'sparse': {'reward_remaining': 0.01}},
+#                     'anneal_frac': 0.1}
+
+
+# sumohuman and you shall not pass
+# REW_SHAPE_PARAMS = {'weights': {'dense': {'reward_move': 0.1}, 'sparse': {'reward_remaining': 0.01}},
+                   'anneal_frac': 0}
 #
 # REW_SHAPE_PARAMS_ADV = {'weights': {'dense': {'reward_move': 0.5, 'reward_contact': 1, 'reward_survive': 0.5,},
 #                                 'sparse': {'reward_remaining': 0.01}},
