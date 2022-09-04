@@ -222,7 +222,7 @@ def Adv_train(env, total_timesteps, checkpoint_interval, log_interval, callback_
 
 # sumohuman and you shall not pass
 # REW_SHAPE_PARAMS = {'weights': {'dense': {'reward_move': 0.1}, 'sparse': {'reward_remaining': 0.01}},
-                   'anneal_frac': 0}
+#                   'anneal_frac': 0}
 #
 # REW_SHAPE_PARAMS_ADV = {'weights': {'dense': {'reward_move': 0.5, 'reward_contact': 1, 'reward_survive': 0.5,},
 #                                 'sparse': {'reward_remaining': 0.01}},
