@@ -16,8 +16,8 @@ git config --global url."https://".insteadOf git://
 pip install -r requirements.txt
 ```
 (It is noticed that you will encounter an error about a conflict of the required version of the gym. Please just ignore this error. It wouldn't impede the running. )
-* Move `gym_compete.zip` in this folder into `anaconda3/envs/mujoco/lib/python3.X/site-packages/`
-* Run `unzip gym_compete.zip`. After that You will find two folders `gym_compete` and `gym_compete-0.0.1.dist-info` in `anaconda3/envs/mujoco/lib/python3.X/site-packages/` (e.g., if your python verison is 3.7, the path will be anaconda3/envs/mujoco/lib/python3.7/site-packages/).
+* Move `gym_compete.zip` in this folder into `anaconda3/envs/rnd_attack/lib/python3.X/site-packages/`
+* Run `unzip gym_compete.zip`. After that You will find two folders `gym_compete` and `gym_compete-0.0.1.dist-info` in `anaconda3/envs/rnd_attack/lib/python3.X/site-packages/` (e.g., if your python verison is 3.7, the path will be anaconda3/envs/rnd_attack/lib/python3.7/site-packages/).
 
 It is noticed that the version of Mujoco is 1.3.1.
 
