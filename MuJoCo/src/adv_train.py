@@ -22,7 +22,7 @@ from value_ori import MlpLstmValue
 ##################
 parser = argparse.ArgumentParser()
 # game env
-parser.add_argument("--env", type=int, default=2)
+parser.add_argument("--env", type=int, default=4)
 # random seed
 parser.add_argument("--seed", type=int, default=1)
 # number of game environment.
@@ -76,7 +76,7 @@ parser.add_argument("--render", type=int, default=0)
 parser.add_argument("--algorithm", type=str, default='rnd_policy')
 
 # explore coefficient
-parser.add_argument("--explore", type=float, default='1.0')
+parser.add_argument("--explore", type=float, default='0.5')
 
 args = parser.parse_args()
 
@@ -100,9 +100,9 @@ VIC_AGT_ID = args.vic_agt_id
 # 1: linear
 
 ## runtogoalants or youshall
-REW_SHAPE_PARAMS = {'weights': {'dense': {'reward_move': 0.5, 'reward_contact': 1, 'reward_survive': 0.5,},
-                                'sparse': {'reward_remaining': 0.01}},
-                   'anneal_frac': 0.01, 'anneal_type': 0}
+# REW_SHAPE_PARAMS = {'weights': {'dense': {'reward_move': 0.5, 'reward_contact': 1, 'reward_survive': 0.5,},
+#                                 'sparse': {'reward_remaining': 0.01}},
+#                    'anneal_frac': 0.01, 'anneal_type': 0}
 #
 # REW_SHAPE_PARAMS_ADV = {'weights': {'dense': {'reward_move': 0.5, 'reward_contact': 1, 'reward_survive': 0.5,},
 #                                 'sparse': {'reward_remaining': 0.01}},
@@ -114,8 +114,8 @@ REW_SHAPE_PARAMS = {'weights': {'dense': {'reward_move': 0.5, 'reward_contact': 
 
 
 # sumohuman and you shall not pass
-# REW_SHAPE_PARAMS = {'weights': {'dense': {'reward_move': 0.1}, 'sparse': {'reward_remaining': 0.01}},
-#                    'anneal_frac': 0}
+REW_SHAPE_PARAMS = {'weights': {'dense': {'reward_move': 0.1}, 'sparse': {'reward_remaining': 0.01}},
+                   'anneal_frac': 0}
 
 # reward discount factor
 GAMMA = 0.99
