@@ -10,7 +10,12 @@ All the code files you need to replicate our experiments are released in the fol
 * Install scikit-learn package: `pip install -U scikit-learn`
 * Install tensorflow package: `pip install tensorflow==1.14`
 * Install openmpi pacage: `sudo apt-get update && sudo apt-get install cmake libopenmpi-dev zlib1g-dev`
-* Please run: `pip install -r requirements.txt` (It is noticed that you will encounter an error about a conflict of the required version of the gym. Please just ignore this error. It wouldn't impede the running. )
+* Please run: 
+```
+git config --global url."https://".insteadOf git://
+pip install -r requirements.txt
+```
+(It is noticed that you will encounter an error about a conflict of the required version of the gym. Please just ignore this error. It wouldn't impede the running. )
 * Move `gym_compete.zip` in this folder into `anaconda3/envs/mujoco/lib/python3.X/site-packages/`
 * Run `unzip gym_compete.zip`. After that You will find two folders `gym_compete` and `gym_compete-0.0.1.dist-info` in `anaconda3/envs/mujoco/lib/python3.X/site-packages/`.
 
