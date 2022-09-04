@@ -23,6 +23,7 @@ It is noticed that the version of Mujoco is 1.3.1.
 cd src
 python adv_train.py --env <env_id> --vic_agt_id <vic_agt_id> --explore <explore> --algorithm rnd_policy
 ```
+e.g., `python adv_train.py --env 4 --vic_agt_id 1 --explore 0.5 --algorithm rnd_policy`
 - Baseline attack: please run
 ```
 python adv_train.py --env <env_id> --vic_agt_id <vic_agt_id> --algorithm regular
