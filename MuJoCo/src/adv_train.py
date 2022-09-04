@@ -103,10 +103,6 @@ VIC_AGT_ID = args.vic_agt_id
 # REW_SHAPE_PARAMS = {'weights': {'dense': {'reward_move': 0.5, 'reward_contact': 1, 'reward_survive': 0.5,},
 #                                 'sparse': {'reward_remaining': 0.01}},
 #                    'anneal_frac': 0.01, 'anneal_type': 0}
-#
-# REW_SHAPE_PARAMS_ADV = {'weights': {'dense': {'reward_move': 0.5, 'reward_contact': 1, 'reward_survive': 0.5,},
-#                                 'sparse': {'reward_remaining': 0.01}},
-#                    'anneal_frac': 0, 'anneal_type': 0}
 
 ## sumoants
 # REW_SHAPE_PARAMS = {'weights': {'dense': {'reward_move': 1}, 'sparse': {'reward_remaining': 0.01}},
@@ -206,6 +202,11 @@ def Adv_train(env, total_timesteps, checkpoint_interval, log_interval, callback_
     model.learn(total_timesteps=total_timesteps, log_interval=1, callback=callback, seed=seed,
                 use_victim_ob=use_victim_ob)
 
+#
+# REW_SHAPE_PARAMS_ADV = {'weights': {'dense': {'reward_move': 0.5, 'reward_contact': 1, 'reward_survive': 0.5,},
+#                                 'sparse': {'reward_remaining': 0.01}},
+#                    'anneal_frac': 0, 'anneal_type': 0}
+    
 
 if __name__=="__main__":
 
