@@ -5,7 +5,7 @@ All the code files you need to replicate our experiments are released in the fol
 
 ## Environment Installation (for conda)
 
-* Create a virtual evironments: `conda create -n rnd_attack python==3.6` (python 3.7 also works)
+* Create a virtual evironments: `conda create -n rnd_attack python==3.6 --channel conda-forge` (python 3.7 also works)
 * Activate this environment: `conda activate rnd_attack`
 * Install scikit-learn package: `pip install -U scikit-learn`
 * Install tensorflow package: `pip install tensorflow==1.14`
