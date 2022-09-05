@@ -81,6 +81,9 @@ Playing the adversarial agent with a regular victim agent:
 python test_masked_victim.py --env <env_id> --opp_path <path-of-the-opponent-agent> --norm_path <path-of-the-opponent-observation-normalization> --vic_path <path-of-the-victim-agent> --vic_mask False --is_rnd True
 ```
 ```
+python test_masked_victim.py --env <env_id> --opp_path <path-to-the-opponent-agent> --norm_path <path-to-the-opponent-observation-normalization> --vic_path <path-to-the-victim-agent> --vic_mask True --is_rnd True
+```
+```
 Winner: Agent 0, Scores: [63, 30], Total Episodes: 93
 -----Episode 94-----
 Winner: Agent 0, Scores: [64, 30], Total Episodes: 94
@@ -99,9 +102,7 @@ Winner: Agent 1, Scores: [67, 33], Total Episodes: 100
 ```
 The scores [67, 33] indicates that player 1 and player 2 win 67 and 33 times in the 100 rounds. So, the winning rate of player 1 is 67%, and 33% for player 2.
 Playing the adversarial agent with a masked victim agent: 
-```
-python test_masked_victim.py --env <env_id> --opp_path <path-to-the-opponent-agent> --norm_path <path-to-the-opponent-observation-normalization> --vic_path <path-to-the-victim-agent> --vic_mask True --is_rnd True
-```
+
 
 ## Visualizing the winning and non-loss rate of the adversarial agents/retrained victim agents:
  
