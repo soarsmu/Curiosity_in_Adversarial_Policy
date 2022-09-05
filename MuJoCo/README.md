@@ -1,6 +1,14 @@
 
 # MuJoCo Games
 
+<video id="video" controls="" preload="none" poster="封面">
+      <source id="mp4" src="https://github.com/2019ChenGong/Curiosity_in_Adversarial_Policy/blob/main/MuJoCo/video/kick_adv.mp4" type="video/mp4">
+</videos>
+
+<video width="720" height="303" controls> 
+<source src="https://github.com/2019ChenGong/Curiosity_in_Adversarial_Policy/blob/main/MuJoCo/video/kick_adv.mp4" type="video/mp4">
+</video>
+
 All the code files you need to replicate our experiments are released in the folder `src`.
 
 ## Environment Installation (for conda)
