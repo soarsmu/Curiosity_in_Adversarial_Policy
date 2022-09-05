@@ -5,21 +5,34 @@ All the code files you need to replicate our experiments are released in the fol
 
 ## Environment Installation (for conda)
 
-* Create a virtual evironments: `conda create -n rnd_attack python==3.6 --channel conda-forge` (python 3.7 also works)
+* Create a virtual environment: `conda create -n rnd_attack python==3.6 --channel conda-forge` (python 3.7 also works)
 * Activate this environment: `conda activate rnd_attack`
-* Install scikit-learn package: `pip install -U scikit-learn`
-* Install tensorflow package: `pip install tensorflow==1.14`
-* Install openmpi pacage: `sudo apt-get update && sudo apt-get install cmake libopenmpi-dev zlib1g-dev`
-* Please run: 
+* Install Scikit-learn package: `pip install -U scikit-learn`
+* Run `pip install tensorflow==1.14 mujoco-py==0.5.7 pyparsing==2.4.7`
+* Install openmpi package: `sudo apt-get update && sudo apt-get install cmake libopenmpi-dev zlib1g-dev`
+* Install OpenGL package: 
 ```
-git config --global url."https://".insteadOf git://
-pip install -r requirements.txt
+sudo apt-get install build-essential libgl1-mesa-dev libglew-dev libsdl2-dev libsdl2-image-dev libglm-dev libfreetype6-dev libglfw3-dev libglfw3 libglu1-mesa-dev 
 ```
-(It is noticed that you will encounter an error about a conflict of the required version of the gym. Please just ignore this error. It wouldn't impede the running. )
-* Move `gym_compete.zip` in this folder into `anaconda3/envs/rnd_attack/lib/python3.X/site-packages/` (e.g., if your python verison is 3.7, the path will be anaconda3/envs/rnd_attack/lib/python3.7/site-packages/).
+* Run `git config --global url."https://".insteadOf git://`
+* Run `pip install git+git://github.com/HumanCompatibleAI/baselines.git@f70377#egg=baselines`
+* Run `pip install git+git://github.com/HumanCompatibleAI/baselines.git@906d83#egg=stable-baselines`
+* Run `pip install git+git://github.com/HumanCompatibleAI/gym.git@1918002#wheel=gym`
+(It is noticed that you will encounter an error about a conflict of the required version of the gym. Please just ignore this error. It wouldn't impede the running.)
+* Move `gym_compete.zip` in this folder into `<your-conda-path>/envs/rnd_attack/lib/python3.X/site-packages/` (e.g., if your python version is 3.7, the path will be `<your-conda-path>/envs/rnd_attack/lib/python3.7/site-packages/`).
 * Run `unzip gym_compete.zip`. After that You will find two folders `gym_compete` and `gym_compete-0.0.1.dist-info` in `anaconda3/envs/rnd_attack/lib/python3.X/site-packages/`
 
-It is noticed that the version of Mujoco is 1.3.1.
+It is noticed that the version of MuJoCo is 1.3.1. For the installation of MuJoCo, pls run:
+```
+cd ~
+wget https://www.roboti.us/download/mjpro131_linux.zip
+mkdir ~/.mujoco
+mv mjpro131_linux.zip ~/.mujoco/
+cd ~/.mujoco 
+unzip mjpro131_linux.zip 
+wget https://www.roboti.us/file/mjkey.txt
+cp mjkey.txt mjpro131
+```
 
 ## Training Curiosity-Driven and Victim-Aware Adversarial Policies:
 
