@@ -124,5 +124,5 @@ python plot_tsne.py --dir <path-to-victim-activations> --output_dir <output-fold
 
 ## Video
 
-An attacker can manipulate the victim agent's observation by taking uncommon actions to lead the game into unfamiliar states, and as a result making the victim exhibit undesired sub-optimal behaviours. Pls readers go into the folder `video` for more videos.
+In Kick and Defend task, the blue one (victim) aims to shoot the b to the target region, and the red one (attacker) want to stop it. We can observe that an attacker can manipulate the victim agent's observation by taking uncommon actions to lead the game into unfamiliar states, and as a result making the victim exhibit undesired sub-optimal behaviours. Pls readers go into the folder `video` for more videos.
 ![images](https://github.com/2019ChenGong/Curiosity_in_Adversarial_Policy/blob/main/MuJoCo/video/kick_adv.gif)
