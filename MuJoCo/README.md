@@ -122,6 +122,7 @@ To generate the results of t-SNE visualization:
 python plot_tsne.py --dir <path-to-victim-activations> --output_dir <output-folder>
 ```
 
+## Video
 
 An attacker can manipulate the victim agent's observation by taking uncommon actions to lead the game into unfamiliar states, and as a result making the victim exhibit undesired sub-optimal behaviours. Pls readers go into the folder `video` for more videos.
 ![images](https://github.com/2019ChenGong/Curiosity_in_Adversarial_Policy/blob/main/MuJoCo/video/kick_adv.gif)
