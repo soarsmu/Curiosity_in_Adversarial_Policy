@@ -8,7 +8,7 @@ This is the codebase for 'Curiosity-Driven and Victim-Aware Adversarial Policies
 
 ## Project structure
 
-The structure of this project is as follows：
+The structure of this project is as follows:
 ```
 MuJoCo
     -- src

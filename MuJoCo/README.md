@@ -36,7 +36,7 @@ cp mjkey.txt mjpro131
 
 ## Evaluation:
 
-We release well-trained model parameters of adversaril policies and retrained victims in folder `our agent`. Readers can play the adversarial agent with a regular victim agent: 
+We release well-trained model parameters of adversarial policies and retrained victims in folder `our agent`. Readers can play the adversarial agent with a regular victim agent: 
 ```
 python test_masked_victim.py --env <env_id> --opp_path <path-of-the-opponent-agent> --norm_path <path-of-the-opponent-observation-normalization> --vic_path <path-of-the-victim-agent> --vic_mask False --is_rnd True
 ```
@@ -126,7 +126,7 @@ python plot_tsne.py --dir <path-to-victim-activations> --output_dir <output-fold
 
 ## Video
 
-In Kick and Defend task, the blue one (victim) aims to shoot the b to the target region, and the red one (attacker) wants to stop it. We can observe that an attacker can manipulate the victim agent's observation by taking uncommon actions to lead the game into unfamiliar states and, as a result, make the victim exhibit undesired sub-optimal behaviors. Please readers go into the folder `video` for more videos.
+In Kick and Defend task, the blue one (victim) aims to shoot the b to the target region, and the red one (attacker) wants to stop it. We can observe that an attacker can manipulate the victim agent's observation by taking uncommon actions to lead the game into unfamiliar states and, as a result, make the victim exhibit undesired suboptimal behaviors. Please readers go into the folder `video` for more videos.
 
 ![images](https://github.com/2019ChenGong/Curiosity_in_Adversarial_Policy/blob/main/MuJoCo/video/kick_adv.gif)
 
