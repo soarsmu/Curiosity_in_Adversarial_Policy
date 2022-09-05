@@ -2,6 +2,8 @@
 
 This is the codebase for 'Curiosity-Driven and Victim-Aware Adversarial Policies'.
 
+[![IMAGE ALT TEXT]([http://img.youtube.com/vi/GtlcOowVptU/0.jpg)](https://www.youtube.com/watch?v=GtlcOowVptU "Unity Snake Game"](https://github.com/2019ChenGong/Curiosity_in_Adversarial_Policy/blob/main/MuJoCo/video/kick_adv.mp4)
+
 ## Project structure
 
 The structure of this project is as follows：
