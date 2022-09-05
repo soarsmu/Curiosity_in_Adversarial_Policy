@@ -126,9 +126,10 @@ python plot_tsne.py --dir <path-to-victim-activations> --output_dir <output-fold
 
 ## Video
 
-In Kick and Defend task, the blue one (victim) aims to shoot the b to the target region, and the red one (attacker) want to stop it. We can observe that an attacker can manipulate the victim agent's observation by taking uncommon actions to lead the game into unfamiliar states, and as a result making the victim exhibit undesired sub-optimal behaviours. Pls readers go into the folder `video` for more videos.
+In Kick and Defend task, the blue one (victim) aims to shoot the b to the target region, and the red one (attacker) wants to stop it. We can observe that an attacker can manipulate the victim agent's observation by taking uncommon actions to lead the game into unfamiliar states and, as a result, make the victim exhibit undesired sub-optimal behaviors. Please readers go into the folder `video` for more videos.
 
 ![images](https://github.com/2019ChenGong/Curiosity_in_Adversarial_Policy/blob/main/MuJoCo/video/kick_adv.gif)
 
 ## Notice
-Regarding randomness, it is common for DRL, especially MuJoCo games, to establish randomness due to seed selections. Our baseline method also observes similar problems the same as prior works (https://github.com/psuwuxian/rl_adv_valuediff/issues/5 and https://github.com/HumanCompatibleAI/adversarial-policies/issues/26). Therefore, we used the same approach mentioned in their repository and ran many random seeds, and reported the results of the best five seeds to plot our training curves. Finally, we confirm that the released well-trained models in the folder our agent can match the results claimed in our paper.
+
+Due to the random nature of DRL, it is common, especially MuJoCo games, to get different results in every attempt. Our baseline method, as well as prior works, also observe similar problems (https://github.com/psuwuxian/rl_adv_valuediff/issues/5 and https://github.com/HumanCompatibleAI/adversarial-policies/issues/26). Therefore, we used the same approach mentioned in the repository of our baseline. We ran many random seeds and reported the results of the best five seeds to plot our training curves. We also confirm that the released well-trained models in `our agent` folder can match the results claimed in our paper.
