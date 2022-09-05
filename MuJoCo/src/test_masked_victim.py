@@ -158,7 +158,7 @@ if __name__ == "__main__":
     p.add_argument("--env", default=2, type=int)
 
     # # YouShallNotPass ../adv-agent/our_attack/you/model.pkl
-    p.add_argument("--opp-path", default="/home/gc/Curiosity_in_Adversarial_Policy-review/MuJoCo/adv-agent/baseline/you/model.pkl", type=str)
+    p.add_argument("--opp_path", default="/home/gc/Curiosity_in_Adversarial_Policy-review/MuJoCo/adv-agent/baseline/you/model.pkl", type=str)
     p.add_argument("--vic_path", default="../../multiagent-competition/agent-zoo/you-shall-not-pass/agent2_parameters-v1.pkl", type=str)
     p.add_argument("--norm_path", default="/home/gc/Curiosity_in_Adversarial_Policy-review/MuJoCo/adv-agent/baseline/you/obs_rms.pkl", type=str)
 
