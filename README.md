@@ -2,9 +2,9 @@
 
 This is the codebase for 'Curiosity-Driven and Victim-Aware Adversarial Policies'.
 
-<video width="320" height="240" controls>
-    <source src="[movie.mp4](https://github.com/2019ChenGong/Curiosity_in_Adversarial_Policy/blob/main/MuJoCo/video/kick_adv.mp4)" type="video/mp4">
-</video>()
+<video width="720" height="303" controls> 
+<source src="https://github.com/2019ChenGong/Curiosity_in_Adversarial_Policy/blob/main/MuJoCo/video/kick_adv.mp4" type="video/mp4">
+</video>
 
 ## Project structure
 
