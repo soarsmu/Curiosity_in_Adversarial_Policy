@@ -106,10 +106,10 @@ Playing the adversarial agent with a masked victim agent:
 
 ## Visualizing the winning and non-loss rate of the adversarial agents/retrained victim agents:
  
-To visualize the winning and non-loss rate of the adversarial agents, please open the tensorboard logs saved into the folder `../agent-zoo/` and execute `tensorboard --logdir=<tensorboard file>`.
+To visualize the winning and non-loss rate of the adversarial agents, please open the tensorboard logs saved into the folder `../agent-zoo/` and execute `tensorboard --logdir=<tensorboard file>`. This repository presents the examples of tensorboard logs in the folder `tensorboard_records`. We list a part of them in the follows: 
 ![images](https://github.com/2019ChenGong/Curiosity_in_Adversarial_Policy/blob/main/MuJoCo/tensorboard_records/images/github_images.jpg)
 retrain_plot.py
-```
+The item . Please interested readers refer to the folder `tensorboard_records` for more examples.
 
 ## Visualizing the t-SNE:
 
