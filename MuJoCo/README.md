@@ -34,46 +34,6 @@ wget https://www.roboti.us/file/mjkey.txt
 cp mjkey.txt mjpro131
 ```
 
-## Training Curiosity-Driven and Victim-Aware Adversarial Policies:
-
-- Our attack: please run 
-```
-cd src
-python adv_train.py --env <env_id> --vic_agt_id <vic_agt_id> --explore <explore> --algorithm rnd_policy
-```
-e.g., `python adv_train.py --env 4 --vic_agt_id 1 --explore 0.5 --algorithm rnd_policy`
-- Baseline attack: please run
-```
-python adv_train.py --env <env_id> --vic_agt_id <vic_agt_id> --algorithm regular
-```
-In the above scripts, `<env_id>` specifies the game environment, the options are as follows:
-| env_id | env |
-| ------ | ----------- |
-| 0      |  RunToGoalAnts-v0           |
-| 1      |  RunToGoalHumans-v0           |
-| 2      |  YouShallNotPassHumans-v0           |
-| 3      |  KickAndDefend-v0           |
-| 4      | SumoAnts-v0            |
-| 5      |  SumoHumans-v0           |
-
-`<vic_agt_id>` specifies the victim policy under attacking (The exact choices for each game are shown in ```adv_train.py```). ```adv_train.py``` also gives the descriptions and default values for other hyper-parameters.
- 
-After training, the trained models and tensorboard logs are saved into the folder `../agent-zoo/<env>`, where `<env>` is the name of environments corresponding to the `<env_id>`.
-
-## Retraining of Victim Agents:
-
-The adversarial model used for the retraining experiments in the `../our agent/attack/` folder. The weights of the adversarial policy networks are named as ```model.pkl```, and the mean and variance of the observation normalization is named as `obs_rms.pkl`.
-
-For retraining:
-```
-python victim_train.py --env <env_id> --vic_agt_id <vic_agt_id> --adv_path <path-of-advesaries-model> --adv_obs_normpath <path-of-adversaries-observation-normalization> --is_rnd Ture
-```
-
-It is noticed that the choice of `<vic_agt_id>` should be consistent with that in adversarial training.
-
-After training, the trained models and tensorboard logs are saved into the folder `../victim-agent-zoo/<env>`, where `<env>` is the name of environments corresponding to the `<env_id>`.
-
-
 ## Evaluation:
 
 We release well-trained model parameters of adversaril policies and retrained victims in folder `our agent`. Readers can play the adversarial agent with a regular victim agent: 
@@ -103,7 +63,47 @@ Winner: Agent 1, Scores: [67, 33], Total Episodes: 100
 ```
 The scores [67, 33] indicates that player 1 and player 2 win 67 and 33 times in the 100 rounds. So, the winning rate of player 1 is 67%, and 33% for player 2.
 
-If readers perfer to train the adversial policies from scratch, please refer to the above section `Training Curiosity-Driven and Victim-Aware Adversarial Policies`. 
+In the above scripts, `<env_id>` specifies the game environment, the options are as follows:
+| env_id | env |
+| ------ | ----------- |
+| 0      |  RunToGoalAnts-v0           |
+| 1      |  RunToGoalHumans-v0           |
+| 2      |  YouShallNotPassHumans-v0           |
+| 3      |  KickAndDefend-v0           |
+| 4      | SumoAnts-v0            |
+| 5      |  SumoHumans-v0           |
+
+It is noticed that we need to spend a range of computational resources and time (i.e., 24 hours for each task) on training the policies from scratch. So, if readers select our method as their baseline, we suggest they directly use our released model parameters. What's more, if readers prefer to train the adversarial policies from scratch, please refer to the next section `Training Curiosity-Driven and Victim-Aware Adversarial Policies`.
+
+## Training Curiosity-Driven and Victim-Aware Adversarial Policies:
+
+- Our attack: please run 
+```
+cd src
+python adv_train.py --env <env_id> --vic_agt_id <vic_agt_id> --explore <explore> --algorithm rnd_policy
+```
+e.g., `python adv_train.py --env 4 --vic_agt_id 1 --explore 0.5 --algorithm rnd_policy`
+- Baseline attack: please run
+```
+python adv_train.py --env <env_id> --vic_agt_id <vic_agt_id> --algorithm regular
+```
+
+`<vic_agt_id>` specifies the victim policy under attacking (The exact choices for each game are shown in ```adv_train.py```). ```adv_train.py``` also gives the descriptions and default values for other hyper-parameters.
+ 
+After training, the trained models and tensorboard logs are saved into the folder `../agent-zoo/<env>`, where `<env>` is the name of environments corresponding to the `<env_id>`.
+
+## Retraining of Victim Agents:
+
+The adversarial model used for the retraining experiments in the `../our agent/attack/` folder. The weights of the adversarial policy networks are named as ```model.pkl```, and the mean and variance of the observation normalization is named as `obs_rms.pkl`.
+
+For retraining:
+```
+python victim_train.py --env <env_id> --vic_agt_id <vic_agt_id> --adv_path <path-of-advesaries-model> --adv_obs_normpath <path-of-adversaries-observation-normalization> --is_rnd Ture
+```
+
+It is noticed that the choice of `<vic_agt_id>` should be consistent with that in adversarial training.
+
+After training, the trained models and tensorboard logs are saved into the folder `../victim-agent-zoo/<env>`, where `<env>` is the name of environments corresponding to the `<env_id>`. 
 
 
 ## Visualizing the winning rate of the adversarial agents/retrained victim agents:
