@@ -108,7 +108,7 @@ The scores [67, 33] indicates that player 1 and player 2 win 67 and 33 times in 
 ## Visualizing the winning rate of the adversarial agents/retrained victim agents:
  
 To visualize the winning and non-loss rate of the adversarial agents, please open the tensorboard logs saved into the folder `../agent-zoo/` and execute `tensorboard --logdir=<tensorboard file>`. This repository presents examples of tensorboard logs in the folder `tensorboard_records`. We list a part of them as follows: 
-![images](https://github.com/2019ChenGong/Curiosity_in_Adversarial_Policy/blob/main/MuJoCo/tensorboard_records/images/github_images.jpg)
+![images](https://github.com/2019ChenGong/Curiosity_in_Adversarial_Policy/blob/main/MuJoCo/tensorboard_records/images/github_images.pdf)
 Please interested readers refer to the folder `tensorboard_records` for more examples.
 
 ## Visualizing the t-SNE:
