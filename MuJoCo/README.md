@@ -73,7 +73,7 @@ In the above scripts, `<env_id>` specifies the game environment, the options are
 | 4      | SumoAnts-v0            |
 | 5      |  SumoHumans-v0           |
 
-It is noticed that we need to spend a range of computational resources and time (i.e., 24 hours for each task) on training the policies from scratch. Therefore, we suggest readers directly use our released model parameters for replication. What's more, if readers prefer to train the adversarial policies from scratch, please refer to the next section `Training Curiosity-Driven and Victim-Aware Adversarial Policies`.
+It is noticed that we need to spend massive computational resources and time (i.e., 24 hours for each task) on training the policies from scratch. Therefore, we suggest readers directly use our released model checkpoints for replication. What's more, if readers prefer to train the adversarial policies from scratch, please refer to the next section `Training Curiosity-Driven and Victim-Aware Adversarial Policies`.
 
 ## Training Curiosity-Driven and Victim-Aware Adversarial Policies:
 
