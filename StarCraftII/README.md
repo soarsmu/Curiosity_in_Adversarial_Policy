@@ -4,9 +4,14 @@ All the code files you need to replicate our experiments are released in the fol
 
 For configurations, please pull and install the repo from: https://github.com/Tencent/PySC2TencentExtension. Then, run 
 ```
-pip install -r requirments.txt
+pip install -r requirements.txt
 ```
-It is noticed that the version of StarCraftII is SC2 4.6.2 (B69232).
+It is noticed that the version of StarCraftII is SC2 4.6.2 (B69232). Pls run
+```
+cd ~
+wget https://blzdistsc2-a.akamaihd.net/Linux/SC2.4.6.2.69232.zip
+unzip SC2.4.6.2.69232.zip # Password is iagreetotheeula
+```
 
 ## Training Curiosity-Driven and Victim-Aware Adversarial Policies:
 
