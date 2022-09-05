@@ -57,7 +57,7 @@ done;
 It is noticed that `20` refers to the number of actors.
 
 ## Evaluation:
-To play against an adversarial agent with a victim to calcualte the winning and non-loss rates of adversarial agent:
+To play against an adversarial agent with a victim to calculate the winning and non-loss rates of adversarial agent:
 ```
 python -m bin.evaluate_vs_rl --model_path=<path-of-the-adversarial-agent> --victim_path=<path-of-the-victim-agent> --mask_victim=False
 ```
