@@ -76,7 +76,7 @@ After training, the trained models and tensorboard logs are saved into the folde
 
 ## Evaluation:
 
-We release well-done model parameters of adversaril policies and retrained victims in folder `our agent`. Readers can play the adversarial agent with a regular victim agent: 
+We release well-trained model parameters of adversaril policies and retrained victims in folder `our agent`. Readers can play the adversarial agent with a regular victim agent: 
 ```
 python test_masked_victim.py --env <env_id> --opp_path <path-of-the-opponent-agent> --norm_path <path-of-the-opponent-observation-normalization> --vic_path <path-of-the-victim-agent> --vic_mask False --is_rnd True
 ```
