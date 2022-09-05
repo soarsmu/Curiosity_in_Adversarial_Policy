@@ -104,8 +104,6 @@ Winner: Agent 1, Scores: [67, 33], Total Episodes: 100
 The scores [67, 33] indicates that player 1 and player 2 win 67 and 33 times in the 100 rounds. So, the winning rate of player 1 is 67%, and 33% for player 2.
 
 If readers perfer to train the adversial policies from scratch, please refer to the above section `Training Curiosity-Driven and Victim-Aware Adversarial Policies`.
-These are collected as the same method of priors work (https://github.com/psuwuxian/rl_adv_valuediff/issues/5).
-
 
 
 ## Visualizing the winning rate of the adversarial agents/retrained victim agents:
