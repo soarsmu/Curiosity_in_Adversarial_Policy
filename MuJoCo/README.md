@@ -1,7 +1,7 @@
 
 # MuJoCo Games
 
-<video id="video" controls="" preload="none" poster="封面">
+<video id="video" controls="" preload="none>
       <source id="mp4" src="https://github.com/2019ChenGong/Curiosity_in_Adversarial_Policy/blob/main/MuJoCo/video/kick_adv.mp4" type="video/mp4">
 </videos>
 
