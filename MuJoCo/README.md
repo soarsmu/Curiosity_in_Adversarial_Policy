@@ -107,6 +107,7 @@ Playing the adversarial agent with a masked victim agent:
 ## Visualizing the winning and non-loss rate of the adversarial agents/retrained victim agents:
  
 To visualize the winning and non-loss rate of the adversarial agents:
+![images](https://github.com/2019ChenGong/Curiosity_in_Adversarial_Policy/blob/main/MuJoCo/tensorboard_records/images/github_images.jpg)
 ```
 cd ../rnd_result
 python calnon_loss.py
