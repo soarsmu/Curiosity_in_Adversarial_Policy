@@ -6,7 +6,7 @@ For configurations, please pull and install the repo from: https://github.com/Te
 ```
 pip install -r requirements.txt
 ```
-It is noticed that the version of StarCraftII is SC2 4.6.2 (B69232). Pls run
+It is noticed that the version of StarCraft II is SC2 4.6.2 (B69232). For the installation, pls run
 ```
 cd ~
 wget https://blzdistsc2-a.akamaihd.net/Linux/SC2.4.6.2.69232.zip
