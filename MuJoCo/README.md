@@ -103,7 +103,7 @@ Winner: Agent 1, Scores: [67, 33], Total Episodes: 100
 ```
 The scores [67, 33] indicates that player 1 and player 2 win 67 and 33 times in the 100 rounds. So, the winning rate of player 1 is 67%, and 33% for player 2.
 
-If readers perfer to train the adversial policies from scratch, please refer to the above section `Training Curiosity-Driven and Victim-Aware Adversarial Policies`.
+If readers perfer to train the adversial policies from scratch, please refer to the above section `Training Curiosity-Driven and Victim-Aware Adversarial Policies`. Regarding randomness, it is common for DRL, especially MuJoCo games, to establish randomness due to seed selections. Our baseline method also observes similar problems the same as prior works (https://github.com/psuwuxian/rl_adv_valuediff/issues/5 and https://github.com/HumanCompatibleAI/adversarial-policies/issues/26). Therefore, we use the same approach mentioned in their repository and rnn many random seeds and reported the results of the best five seeds.
 
 
 ## Visualizing the winning rate of the adversarial agents/retrained victim agents:
