@@ -103,7 +103,7 @@ Winner: Agent 1, Scores: [67, 33], Total Episodes: 100
 ```
 The scores [67, 33] indicates that player 1 and player 2 win 67 and 33 times in the 100 rounds. So, the winning rate of player 1 is 67%, and 33% for player 2.
 
-If readers perfer to train the adversial policies from scratch, please refer to the above section `Training Curiosity-Driven and Victim-Aware Adversarial Policies`. Regarding randomness, it is common for DRL, especially MuJoCo games, to establish randomness due to seed selections. Our baseline method also observes similar problems the same as prior works (https://github.com/psuwuxian/rl_adv_valuediff/issues/5 and https://github.com/HumanCompatibleAI/adversarial-policies/issues/26). Therefore, we use the same approach mentioned in their repository and rnn many random seeds and reported the results of the best five seeds.
+If readers perfer to train the adversial policies from scratch, please refer to the above section `Training Curiosity-Driven and Victim-Aware Adversarial Policies`. 
 
 
 ## Visualizing the winning rate of the adversarial agents/retrained victim agents:
@@ -129,3 +129,6 @@ python plot_tsne.py --dir <path-to-victim-activations> --output_dir <output-fold
 In Kick and Defend task, the blue one (victim) aims to shoot the b to the target region, and the red one (attacker) want to stop it. We can observe that an attacker can manipulate the victim agent's observation by taking uncommon actions to lead the game into unfamiliar states, and as a result making the victim exhibit undesired sub-optimal behaviours. Pls readers go into the folder `video` for more videos.
 
 ![images](https://github.com/2019ChenGong/Curiosity_in_Adversarial_Policy/blob/main/MuJoCo/video/kick_adv.gif)
+
+## Notice
+Regarding randomness, it is common for DRL, especially MuJoCo games, to establish randomness due to seed selections. Our baseline method also observes similar problems the same as prior works (https://github.com/psuwuxian/rl_adv_valuediff/issues/5 and https://github.com/HumanCompatibleAI/adversarial-policies/issues/26). Therefore, we use the same approach mentioned in their repository and run many random seeds and reported the results of the best five seeds to plot our training curves. Finally, we confirm that the released well-trained models in folder `our agent` can match the results claimed in our paper.
