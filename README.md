@@ -1,6 +1,6 @@
 ## Intro
 
-This is the codebase for 'Curiosity-Driven and Victim-Aware Adversarial Policies'.
+Replication Package for "Curiosity-Driven and Victim-Aware Adversarial Policies", ACSAC 2022.
 
 <video width="720" height="303" controls> 
 <source src="https://github.com/2019ChenGong/Curiosity_in_Adversarial_Policy/blob/main/MuJoCo/video/kick_adv.mp4" type="video/mp4">
