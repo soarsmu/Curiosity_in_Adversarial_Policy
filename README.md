@@ -5,7 +5,7 @@ Replication Package for "Curiosity-Driven and Victim-Aware Adversarial Policies"
 ## Overview
 
 Recent years have witnessed great potential in applying Deep Reinforcement Learning (DRL) in various challenging applications, such as autonomous driving, nuclear fusion control, complex game playing, etc. 
-However, recently researchers have revealed that deep reinforcement learning models are vulnerable to adversarial attacks: malicious attackers can train \textit{adversarial policies} to tamper with the observations of a well-trained victim agent, the latter of which fails dramatically when faced with such an attack. Understanding and improving the adversarial robustness of deep reinforcement learning is of great importance in enhancing the quality and reliability of a wide range of DRL-enabled systems. 
+However, recently researchers have revealed that deep reinforcement learning models are vulnerable to adversarial attacks: malicious attackers can train *adversarial policies* to tamper with the observations of a well-trained victim agent, the latter of which fails dramatically when faced with such an attack. Understanding and improving the adversarial robustness of deep reinforcement learning is of great importance in enhancing the quality and reliability of a wide range of DRL-enabled systems. 
 
 In this paper, we develop *curiosity-driven* and *victim-aware* adversarial policy training, a novel method that can more effectively exploit the defects of victim agents. 
 To be victim-aware, we build a surrogate network that can approximate the state-value function of a black-box victim to collect the victim's information. 
