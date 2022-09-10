@@ -3,13 +3,13 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import os
-results_dir = './total_results'
-#algos = ['baselines1', 'rnd']
-algos = ['retrain']
+results_dir = '/home/gc/attack_rl/rl_adv_valuediff/rnd_sc/src_bk/total_results'
+algos = ['baselines1', 'rnd']
+#algos = ['retrain']
 shuffixs = ['nonloss', 'win']
-sns.set_style('darkgrid')
+#sns.set_style('darkgrid')
 colors = sns.color_palette()
-alpha = 0.8
+alpha = 0.9
 point_num = 60
 colors = sns.color_palette()
 plt.rcParams['font.family'] = 'Times New Roman'
@@ -99,10 +99,10 @@ for shuffix in shuffixs:
     t=pd.concat(dfs)
     t = t.reset_index()
     ax = plt.figure(figsize=(9, 4))
-    ax=sns.lineplot(data = t, x= 'Timesteps', y=label, hue='algo', style ='algo', color = colors, markers = True, dashes=False)
+    ax = sns.lineplot(data = t, x= 'Timesteps', y=label, hue='algo', style ='algo', color = colors, markers = True, dashes=False, markersize=11, lw='2.0')
     for i in range(len(algos)):
-        ax.hlines(max_means[i], 0, 1.5e6, colors = colors[i], ls ='--')
-        ax.text(0, max_means[i], '%.2f' % max_means[i], fontsize=16, verticalalignment='bottom', color =colors[i], weight=1000)
+        ax.hlines(max_means[0], 0, 1.5e6, colors = colors[1], ls ='--')
+        ax.text(0, max_means[0], '%.2f' % max_means[0], fontsize=24, verticalalignment='bottom', color =colors[1], weight=1000, fontweight ='bold')
     y_range = ax.get_yticks()
     y_min = y_range[0]
     if y_min < 0:
@@ -117,11 +117,18 @@ for shuffix in shuffixs:
     for c in new_yticks:
         new_yticks_str.append('%.1f'%c)
     plt.ticklabel_format(axis='x', style='sci', scilimits=(0,0))
-    plt.xticks([0, 0.5e6, 1.0e6, 1.5e6], ['0', '0.5', '1.0', '1.5'], size=14)
-    plt.yticks(new_yticks,new_yticks_str, size=14)
-    plt.ylabel('', fontsize=14)
-    plt.xlabel('Timesteps (1e6)', fontsize=14)
+    plt.xticks([0, 0.5e6, 1.0e6, 1.5e6], ['0', '0.5', '1.0', '1.5'], size=21, fontweight = 'bold')
+    plt.yticks(new_yticks,new_yticks_str, size=21, fontweight = 'bold')
+    plt.ylabel('', fontsize=24)
+    plt.xlabel('Timesteps (1e6)', fontsize=24, fontweight = 'bold')
     plt.legend([], [], frameon=False)
     plt.xlim([0, 1.5e6+1e4])
-    plt.savefig('{}.pdf'.format(shuffix), bbox_inches ='tight')
+    plt.title('StarCraft II', fontsize = 28, fontweight = 'bold')
+    ax.spines['right'].set_color('black')
+    ax.spines['top'].set_color('black')
+    ax.spines['bottom'].set_color('black')
+    ax.spines['left'].set_color('black')
+    plt.grid(True, axis = 'both', linewidth=0.8)
+    env = 'sc'
+    plt.savefig('{}_{}.pdf'.format(env, shuffix), bbox_inches ='tight')
     plt.close()
