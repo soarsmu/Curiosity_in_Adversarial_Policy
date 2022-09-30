@@ -107,7 +107,7 @@ The adversarial model used for the retraining experiments in the `../our agent/a
 
 For retraining:
 ```
-python victim_train.py --env <env_id> --vic_agt_id <vic_agt_id> --adv_path <path-of-advesaries-model> --adv_obs_normpath <path-of-adversaries-observation-normalization> --is_rnd Ture
+python victim_train.py --env <env_id> --vic_agt_id <vic_agt_id> --adv_path <path-of-advesaries-model> --adv_obs_normpath <path-of-adversaries-observation-normalization> --is_rnd 1
 ```
 
 It is noticed that the choice of `<vic_agt_id>` should be consistent with that in adversarial training.
