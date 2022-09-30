@@ -194,11 +194,11 @@ if __name__ == "__main__":
     # p.add_argument("--vic_path", default="../../multiagent-competition/agent-zoo/sumo/ants/agent_parameters-v1.pkl", type=str)
     # p.add_argument("--norm_path", default="/home/gc/Curiosity_in_Adversarial_Policy-review/MuJoCo/our agent/attack/sumoants/obs_rms.pkl", type=str)
 
-    p.add_argument("--vic_mask", default=False, type=bool)
+    p.add_argument("--vic_mask", default=0, type=int)
     p.add_argument("--max-episodes", default=100, help="max number of matches", type=int)
     p.add_argument("--epsilon", default=1e-8, type=float)
     p.add_argument("--clip_obs", default=10, type=float)
-    p.add_argument('--is_rnd', default=True, type=bool)
+    p.add_argument('--is_rnd', default=1, type=int)
 
     config = p.parse_args()
     run(config)
