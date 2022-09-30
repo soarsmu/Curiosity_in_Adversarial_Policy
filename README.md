@@ -32,6 +32,7 @@ MuJoCo
     -- our agent
         -- attack ------------------------ the policy network weights of adversarial agents.
         -- retrained --------------------- the policy network weights of retrained victim agents.
+    -- multiagent-competition ------------ the agent zoo downloaded from the package (https://github.com/openai/multiagent-competition).
     -- adv-agent
         -- baseline ---------------------- the policy network weights of adversarial agents trained by baseline approach.
     -- tensorboard_records ------------------ the curves recorded in tensorboard files during training adversarial policies.
@@ -67,3 +68,4 @@ StarCraft II
 ## Acknowledgement
 
 - The codes for training the adversarial policies are based on the [Adversarial Policy](https://github.com/psuwuxian/rl_adv_valuediff) and [Stable-Baselines](https://github.com/hill-a/stable-baselines).
+- The well trained agent zoo are provide by [OpenAI](https://github.com/openai/multiagent-competition).
