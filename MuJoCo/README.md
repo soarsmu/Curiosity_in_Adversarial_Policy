@@ -65,12 +65,12 @@ The scores [67, 33] indicates that player 1 and player 2 win 67 and 33 times in 
 
 | env | Attacker | Victim |
 | ----------- | ------- | ------- |
-|  RunToGoalAnts-v0           | Agent 0 | Agent 1 |
-|  RunToGoalHumans-v0           |Agent 1 | Agent 0 |
-|  YouShallNotPassHumans-v0           |Agent 0 | Agent 1 |
-|  KickAndDefend-v0           |Agent 0 | Agent 1 |
-| SumoAnts-v0            |Agent 0 | Agent 1 |
-|  SumoHumans-v0           |Agent 0 | Agent 1 |
+|  RunToGoalAnts-v0           | Agent 1 | Agent 0 |
+|  RunToGoalHumans-v0           |Agent 0 | Agent 1 |
+|  YouShallNotPassHumans-v0           |Agent 1 | Agent 0 |
+|  KickAndDefend-v0           |Agent 1 | Agent 0 |
+| SumoAnts-v0            |Agent 1 | Agent 0 |
+|  SumoHumans-v0           |Agent 1 | Agent 0 |
 
 In the above scripts, `<env_id>` specifies the game environment, the options are as follows:
 | env_id | env |
