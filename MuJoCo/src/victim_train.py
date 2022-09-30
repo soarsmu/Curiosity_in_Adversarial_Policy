@@ -32,7 +32,7 @@ parser.add_argument("--n_games", type=int, default=8) # N_GAME = 8
 # which victim agent to use
 parser.add_argument("--vic_agt_id", type=int, default=3)
 
-parser.add_argument('--is_rnd', type=bool, default=True)
+parser.add_argument('--is_rnd', type=int, default=1)
 
 # kickAndDefend
 # /home/gc/attack_rl/rl_adv_valuediff/MuJoCo/adv-baseline/KickAndDefend/our_method/20211122_014022-0/checkpoints/000019906560
