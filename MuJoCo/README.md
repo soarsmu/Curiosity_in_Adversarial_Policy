@@ -38,11 +38,11 @@ cp mjkey.txt mjpro131
 
 We release well-trained model parameters of adversarial policies and retrained victims in folder `our agent`. Readers can play the adversarial agent with a regular victim agent: 
 ```
-python test_masked_victim.py --env <env_id> --opp_path <path-of-the-opponent-agent> --norm_path <path-of-the-opponent-observation-normalization> --vic_path <path-of-the-victim-agent> --vic_mask False --is_rnd True
+python test_masked_victim.py --env <env_id> --opp_path <path-of-the-opponent-agent> --norm_path <path-of-the-opponent-observation-normalization> --vic_path <path-of-the-victim-agent> --vic_mask 0 --is_rnd 1
 ```
 Playing the adversarial agent with a masked victim agent: 
 ```
-python test_masked_victim.py --env <env_id> --opp_path <path-to-the-opponent-agent> --norm_path <path-to-the-opponent-observation-normalization> --vic_path <path-to-the-victim-agent> --vic_mask True --is_rnd True
+python test_masked_victim.py --env <env_id> --opp_path <path-to-the-opponent-agent> --norm_path <path-to-the-opponent-observation-normalization> --vic_path <path-to-the-victim-agent> --vic_mask 1 --is_rnd 1
 ```
 ```
 Winner: Agent 0, Scores: [63, 30], Total Episodes: 93
