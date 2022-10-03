@@ -86,6 +86,7 @@ Change the line 6 in the file `our_plot.py` to assign the folder of results, the
 ```
 python our_plot.py
 ```
+e.g., pls alter the line 6 to "./total_results" and then run "python our_plot.py". You can get the visualization results.
 
 ## Visualizing the t-SNE:
 To collect the victim activations when playing against different opponents:
