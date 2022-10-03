@@ -12,6 +12,9 @@ cd ~
 wget https://blzdistsc2-a.akamaihd.net/Linux/SC2.4.6.2.69232.zip
 unzip SC2.4.6.2.69232.zip # Password is iagreetotheeula
 ```
+Besides, the readme file of how to install the SC (https://github.com/deepmind/pysc2/blob/master/README.md) explain the detail to download map sources, 
+https://github.com/Blizzard/s2client-proto#downloads.
+
 
 ## Training Curiosity-Driven and Victim-Aware Adversarial Policies:
 
